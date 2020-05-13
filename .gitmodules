@@ -1,0 +1,29 @@
+[submodule "deps/VASSAR_lib"]
+	path = deps/VASSAR_lib
+	url = https://github.com/seakers/VASSAR_lib.git
+# [submodule "deps/VASSAR_resources"]
+# 	path = deps/VASSAR_resources
+# 	url = https://github.com/seakers/VASSAR_resources.git
+# [submodule "deps/orekit"]
+# 	path = deps/orekit
+# 	url = https://github.com/seakers/orekit.git
+# 	branch = dev
+# [submodule "deps/mopAOS"]
+# 	path = deps/mopAOS
+# 	url = https://github.com/seakers/mopAOS.git
+# 	branch = develop
+# [submodule "deps/SystemArchitectureProblems"]
+# 	path = deps/SystemArchitectureProblems
+# 	url = https://github.com/seakers/SystemArchitectureProblems.git
+[submodule "deps/VASSAR_resources"]
+	path = deps/VASSAR_resources
+	url = https://github.com/seakers/VASSAR_resources.git
+[submodule "deps/orekit"]
+	path = deps/orekit
+	url = https://github.com/seakers/orekit.git
+[submodule "deps/mopAOS"]
+	path = deps/mopAOS
+	url = https://github.com/seakers/mopAOS.git
+[submodule "deps/SystemArchitectureProblems"]
+	path = deps/SystemArchitectureProblems
+	url = https://github.com/seakers/SystemArchitectureProblems.git
