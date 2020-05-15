@@ -17,7 +17,7 @@
      ({{matchingSlotName1}} $?id&:(> (length$ $?id) 0)) )
 {% endif %}
 
- ?old <- ({{template2}} 
+ ?old <- ({{template2}}
 {% elseif  matchingSlotType1.equalsIgnoreCase("slot")  %}
     ({{matchingSlotName2}} ?id) (factHistory ?fh)
 {% else %}

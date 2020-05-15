@@ -53,7 +53,7 @@ public class Consumer implements Runnable{
             add(
                     new OrbitTemplateRequest.Builder()
                             .applyExtension(new JessExtension())
-                            .templateFilePath("/home/gabe/repos/seakers/design_evaluator/app/src/main/java/evaluator/database/template/definitions/abstractDeffacts.clp")
+                            .templateFilePath("app/src/main/java/evaluator/database/template/definitions/abstractDeffacts.clp")
                             .orbitHeader("DATABASE::Orbit")
                             .templateHeader("orbit-information-facts")
                             .build()
@@ -61,7 +61,7 @@ public class Consumer implements Runnable{
             add(
                     new LaunchVehicleTemplateRequest.Builder()
                             .applyExtension(new JessExtension())
-                            .templateFilePath("/home/gabe/repos/seakers/design_evaluator/app/src/main/java/evaluator/database/template/definitions/abstractDeffacts.clp")
+                            .templateFilePath("app/src/main/java/evaluator/database/template/definitions/abstractDeffacts.clp")
                             .launchVehicleHeader("DATABASE::Launch-vehicle")
                             .templateHeader("DATABASE::launch-vehicle-information-facts")
                             .build()
@@ -69,42 +69,42 @@ public class Consumer implements Runnable{
             add(
                     new MeasurementTemplateRequest.Builder()
                             .applyExtension(new JessExtension())
-                            .templateFilePath("/home/gabe/repos/seakers/design_evaluator/app/src/main/java/evaluator/database/template/definitions/measurementTemplate.clp")
+                            .templateFilePath("app/src/main/java/evaluator/database/template/definitions/measurementTemplate.clp")
                             .templateHeader("REQUIREMENTS::Measurement")
                             .build()
             );
             add(
                     new InstrumentTemplateRequest.Builder()
                             .applyExtension(new JessExtension())
-                            .templateFilePath("/home/gabe/repos/seakers/design_evaluator/app/src/main/java/evaluator/database/template/definitions/measurementTemplate.clp")
+                            .templateFilePath("app/src/main/java/evaluator/database/template/definitions/measurementTemplate.clp")
                             .templateHeader("CAPABILITIES::Manifested-instrument")
                             .build()
             );
             add(
                     new OrbitAttributeTemplateRequest.Builder()
                             .applyExtension(new JessExtension())
-                            .templateFilePath("/home/gabe/repos/seakers/design_evaluator/app/src/main/java/evaluator/database/template/definitions/attributeTemplate.clp")
+                            .templateFilePath("app/src/main/java/evaluator/database/template/definitions/attributeTemplate.clp")
                             .templateHeader("DATABASE::Orbit")
                             .build()
             );
             add(
                     new LaunchVehicleAttributeTemplateRequest.Builder()
                             .applyExtension(new JessExtension())
-                            .templateFilePath("/home/gabe/repos/seakers/design_evaluator/app/src/main/java/evaluator/database/template/definitions/attributeTemplate.clp")
+                            .templateFilePath("app/src/main/java/evaluator/database/template/definitions/attributeTemplate.clp")
                             .templateHeader("DATABASE::Launch-vehicle")
                             .build()
             );
             add(
                     new MissionAttributeTemplateRequest.Builder()
                             .applyExtension(new JessExtension())
-                            .templateFilePath("/home/gabe/repos/seakers/design_evaluator/app/src/main/java/evaluator/database/template/definitions/attributeTemplate.clp")
+                            .templateFilePath("app/src/main/java/evaluator/database/template/definitions/attributeTemplate.clp")
                             .templateHeader("MANIFEST::Mission")
                             .build()
             );
             add(
                     new AttributeInheritanceTemplateRequest.Builder()
                             .applyExtension(new JessExtension())
-                            .templateFilePath("/home/gabe/repos/seakers/design_evaluator/app/src/main/java/evaluator/database/template/definitions/attributeTemplate.clp")
+                            .templateFilePath("/app/src/main/java/evaluator/database/template/definitions/attributeTemplate.clp")
                             .templateHeader("MANIFEST::Mission")
                             .build()
             );
