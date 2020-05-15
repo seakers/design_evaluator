@@ -1,0 +1,100 @@
+# INSTANTIATIONS
+
+
+query OrbitInformation($group_id: Int!, $problem_id: Int!) {
+    items: Orbit(where: {Group: {id: {_eq: $group_id}}}) {
+        id
+        name
+        attributes: Join__Orbit_Attributes(where: {problem_id: {_eq: $problem_id}}) {
+            id
+            value
+            attribute: Orbit_Attribute {
+                name
+            }
+        }
+    }
+}
+
+query LaunchVehicleInformation($group_id: Int, $problem_id: Int!) {
+    items: Launch_Vehicle(where: {Group: {id: {_eq: $group_id}}}) {
+        id
+        name
+        attributes: Join__Launch_Vehicle_Attributes(where: {problem_id: {_eq: $problem_id}}) {
+            value
+            attribute: Launch_Vehicle_Attribute {
+                name
+            }
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+# ATTRIBUTES
+
+query MeasurementAttribute($group_id: Int) {
+    items: Measurement_Attribute(where: {Group: {id: {_eq: $group_id}}}) {
+        id
+        name
+        slot_type
+        type
+    }
+}
+
+query InstrumentAttribute($group_id: Int) {
+    items: Instrument_Attribute(where: {Group: {id: {_eq: $group_id}}}) {
+        id
+        name
+        slot_type
+        type
+    }
+}
+
+query OrbitAttribute($group_id: Int) { # TODO
+    items: Orbit_Attribute(where: {Group: {id: {_eq: $group_id}}}) {
+        id
+        name
+        slot_type
+        type
+    }
+}
+
+query LaunchVehicleAttribute($group_id: Int) { # TODO
+    items: Launch_Vehicle_Attribute(where: {Group: {id: {_eq: $group_id}}}) {
+        id
+        name
+        slot_type
+        type
+    }
+}
+
+query MissionAttribute($problem_id: Int) { # TODO
+    items: Mission_Attribute(where: {Problem: {id: {_eq: $problem_id}}}) {
+        id
+        name
+        slot_type
+        type
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
