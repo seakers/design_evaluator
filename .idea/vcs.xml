@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/SystemArchitectureProblems" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/VASSAR_lib" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/VASSAR_resources" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/mopAOS" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/deps/orekit" vcs="Git" />
+  </component>
+</project>

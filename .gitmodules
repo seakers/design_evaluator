@@ -27,3 +27,6 @@
 [submodule "deps/SystemArchitectureProblems"]
 	path = deps/SystemArchitectureProblems
 	url = https://github.com/seakers/SystemArchitectureProblems.git
+[submodule "graphql-engine"]
+	path = graphql-engine
+	url = git@github.com:hasura/graphql-engine

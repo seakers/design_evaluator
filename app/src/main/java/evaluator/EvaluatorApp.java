@@ -3,21 +3,56 @@
  */
 package evaluator;
 
-import evaluator.database.DatabaseClient;
-import evaluator.database.service.DebugAPI;
-import evaluator.database.service.QueryAPI;
-import evaluator.sqs.Consumer;
+import jess.Userfunction;
+import vassar.GlobalScope;
+import vassar.VassarClient;
+import vassar.database.DatabaseClient;
+import vassar.database.service.DebugAPI;
+import vassar.database.service.QueryAPI;
+import vassar.database.template.TemplateRequest;
+import vassar.database.template.functions.JessExtension;
+import vassar.database.template.request.*;
+import vassar.jess.JessEngine;
+import vassar.jess.JessRequests;
+import vassar.jess.func.Improve;
+import vassar.jess.func.SameOrBetter;
+import vassar.jess.func.Worsen;
+import sqs.Consumer;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class EvaluatorApp {
 
     public static void main(String[] args) {
 
-        // EXECUTION VARS
+
+
+//.----------------. .-----------------..----------------. .----------------.
+//| .--------------. | .--------------. | .--------------. | .--------------. |
+//| |     _____    | | | ____  _____  | | |     _____    | | |  _________   | |
+//| |    |_   _|   | | ||_   \|_   _| | | |    |_   _|   | | | |  _   _  |  | |
+//| |      | |     | | |  |   \ | |   | | |      | |     | | | |_/ | | \_|  | |
+//| |      | |     | | |  | |\ \| |   | | |      | |     | | |     | |      | |
+//| |     _| |_    | | | _| |_\   |_  | | |     _| |_    | | |    _| |_     | |
+//| |    |_____|   | | ||_____|\____| | | |    |_____|   | | |   |_____|    | |
+//| |              | | |              | | |              | | |              | |
+//| '--------------' | '--------------' | '--------------' | '--------------' |
+//'----------------' '----------------' '----------------' '----------------'
+
+        // -------------------------------------------------------------------------------------------------------------
+        // GLOBAL VARS -------------------------------------------------------------------------------------------------
+        GlobalScope.subobjectivesToMeasurements = new HashMap<>();
+        GlobalScope.measurementsToSubobjectives = new HashMap<>();
+
+
+        // -------------------------------------------------------------------------------------------------------------
+        // EXECUTION VARS ----------------------------------------------------------------------------------------------
+        String jessAppFuncPath    = "/home/gabe/repos/seakers/design_evaluator/app/ptypes/functions";
         String outputFilePath     = "/home/gabe/repos/seakers/design_evaluator/app/logs/dbOutput.json";
         String graphqlEndpoint    = "http://localhost:6001/v1/graphql";
         String localstackEndpoint = "http://localhost:4576";
@@ -25,43 +60,131 @@ public class EvaluatorApp {
         boolean debug             = true;
 
         int group_id   = 1;
-        int problem_id = 1;
+        int problem_id = 4;
 
-        // BUILD CLIENT API
+        ArrayList<Userfunction> userFuncs = new ArrayList<>() {{
+            add( new SameOrBetter() );
+            add( new Improve() );
+            add( new Worsen() );
+        }};
+
+        ArrayList<String> batchFuncs = new ArrayList<>() {{
+            add("/home/gabe/repos/seakers/design_evaluator/app/ptypes/functions/update-objective-variable.clp");
+            add("/home/gabe/repos/seakers/design_evaluator/app/ptypes/functions/ContainsRegion.clp");
+            add("/home/gabe/repos/seakers/design_evaluator/app/ptypes/functions/ContainsBands.clp");
+        }};
+
+
+
+
+        // -----> JESS REQUESTS <-----
+        String jessGlobalTempPath = "/home/gabe/repos/seakers/design_evaluator/app/src/main/java/vassar/database/template/defs";
+        String jessGlobalFuncPath = "/home/gabe/repos/seakers/design_evaluator/app/ptypes/functions";
+        String jessAppPath        = "/home/gabe/repos/seakers/design_evaluator/app/problems/smap/clp";
+        String requestMode        = "CRISP-ATTRIBUTES";
+        JessRequests requests = new JessRequests.Builder()
+                                                .setGlobalTemplatePath(jessGlobalTempPath)
+                                                .setGlobalFunctionPath(jessGlobalFuncPath)
+                                                .setFunctionTemplates()
+                                                .setRequestMode(requestMode)
+                                                .setJessAppPath(jessAppPath)
+                                                .build();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// .----------------. .----------------. .----------------. .----------------. .----------------.
+//| .--------------. | .--------------. | .--------------. | .--------------. | .--------------. |
+//| |   ______     | | | _____  _____ | | |     _____    | | |   _____      | | |  ________    | |
+//| |  |_   _ \    | | ||_   _||_   _|| | |    |_   _|   | | |  |_   _|     | | | |_   ___ `.  | |
+//| |    | |_) |   | | |  | |    | |  | | |      | |     | | |    | |       | | |   | |   `. \ | |
+//| |    |  __'.   | | |  | '    ' |  | | |      | |     | | |    | |   _   | | |   | |    | | | |
+//| |   _| |__) |  | | |   \ `--' /   | | |     _| |_    | | |   _| |__/ |  | | |  _| |___.' / | |
+//| |  |_______/   | | |    `.__.'    | | |    |_____|   | | |  |________|  | | | |________.'  | |
+//| |              | | |              | | |              | | |              | | |              | |
+//| '--------------' | '--------------' | '--------------' | '--------------' | '--------------' |
+//'----------------' '----------------' '----------------' '----------------' '----------------'
+
+
+
+        // -------------------------------------------------------------------------------------------------------------
+        // BUILD DATABASE CLIENT ---------------------------------------------------------------------------------------
         QueryAPI queryAPI = new QueryAPI.Builder(apollo_url)
-                                                 .groupID(group_id)
-                                                 .problemID(problem_id)
-                                                 .build();
-
-        // BUILD CLIENT API
-        DebugAPI debugAPI = new DebugAPI.Builder(outputFilePath)
-                                                 .newFile()
-                                                 .build();
-
-        // BUILD DATABASE CLIENT
-        DatabaseClient dbClient = new DatabaseClient.Builder()
-                                              .debug(debug)
-                                              .queryClient(queryAPI)
-                                              .debugClient(debugAPI)
-                                              .build();
-
-        // BUILD SQS CLIENT
-        SqsClient sqsClient = SqsClient.builder()
-                                        .region(Region.US_EAST_2)
-                                        .endpointOverride(URI.create(localstackEndpoint))
-                                        .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+                                        .groupID(group_id)
+                                        .problemID(problem_id)
                                         .build();
 
+        DebugAPI debugAPI = new DebugAPI.Builder(outputFilePath)
+                                        .newFile()
+                                        .build();
+
+        DatabaseClient dbClient = new DatabaseClient.Builder()
+                                        .debug(debug)
+                                        .queryClient(queryAPI)
+                                        .debugClient(debugAPI)
+                                        .build();
+
+        // -------------------------------------------------------------------------------------------------------------
+        // BUILD JESS ENGINE -------------------------------------------------------------------------------------------
+        JessEngine engine = new JessEngine.Builder(dbClient)
+                                        .addUserFunctionBatch(userFuncs)// - Improve(), SameOrBetter(), Worsen()
+//                                        .evalTemplates(jessAppPath)     // - eval: templates, modules
+//                                        .evalBatchFunctions(batchFuncs) // - eval: batch functions
+//                                        .evalStaticFunctions()          // - eval: numerical-to-fuzzy, ...
+                                        .evalRequests(requests.getRequests())         // - eval: template requests (+ functions)
+                                        .build();
+
+
+        // -------------------------------------------------------------------------------------------------------------
+        // BUILD VASSAR CLIENT -----------------------------------------------------------------------------------------
+//        VassarClient vClient = new VassarClient.Builder()
+//                                        .setEngine(engine)
+//                                        .build();
+
+
+
+
+
+
+
+
+
+        // -------------------------------------------------------------------------------------------------------------
+        // BUILD SQS CLIENT --------------------------------------------------------------------------------------------
+//        SqsClient sqsClient = SqsClient.builder()
+//                                        .region(Region.US_EAST_2)
+//                                        .endpointOverride(URI.create(localstackEndpoint))
+//                                        .credentialsProvider(EnvironmentVariableCredentialsProvider.create())
+//                                        .build();
+
+
+
+
+
+
+
+
         // BUILD CONSUMER
-        Consumer evaluator = new Consumer.Builder(sqsClient)
-                                         .setDatabaseClient(dbClient)
-                                         .debug(debug)
-                                         .build();
-
-        // RUN CONSUMER
-        Thread cThread = new Thread(evaluator);
-        cThread.start();
-
+//        Consumer evaluator = new Consumer.Builder(sqsClient)
+//                                         .setDatabaseClient(dbClient)
+//                                         .setJessEngine(engine)
+//                                         .debug(debug)
+//                                         .build();
+//
+//        // RUN CONSUMER
+//        Thread cThread = new Thread(evaluator);
+//        cThread.start();
+//
 
 
 

@@ -1,0 +1,6 @@
+(defglobal ?*app_path* = "{{appPath}}")
+(import seakers.vassar.*)
+(import java.util.*)
+(import jess.*)
+(defglobal ?*rulesMap* = (new java.util.HashMap))
+(set-reset-globals nil)
