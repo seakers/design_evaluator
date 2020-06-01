@@ -51,6 +51,13 @@ public class InstrumentTemplateRequest extends TemplateRequest {
             // QUERY
             List<InstrumentQuery.Item> items = api.instrumentQuery();
 
+            // BUILD PROBLEM
+            String[] instrumentList = new String[items.size()];
+            for(int x=0; x < items.size(); x++){
+                instrumentList[x] = items.get(x).name();
+            }
+            this.problemBuilder.setInstrumentList(instrumentList);
+
             // BUILD CONTEXT
             this.context.put("template_header", this.template_header);
             this.context.put("instrument_header", this.instrument_header);

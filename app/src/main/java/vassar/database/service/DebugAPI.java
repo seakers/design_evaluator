@@ -9,6 +9,8 @@ import org.json.simple.JSONObject;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
+import java.io.PrintWriter;
+import java.util.List;
 
 
 public class DebugAPI {
@@ -18,6 +20,7 @@ public class DebugAPI {
     private JSONObject     json;
     private FileWriter     jsonWriter;
     private String         outputFilePath; // = "/app/logs/jessInitDB.json"; ???
+    private String         outputPath;
 
     public static class Builder {
 
@@ -26,6 +29,7 @@ public class DebugAPI {
         private JSONObject     json;
         private FileWriter     jsonWriter;
         private String         outputFilePath; // = "/app/logs/jessInitDB.json"; ???
+        private String         outputPath;
 
         public Builder(String outputFilePath){
             try {
@@ -58,6 +62,11 @@ public class DebugAPI {
             return this;
         }
 
+        public Builder setOutputPath(String outputPath) {
+            this.outputPath = outputPath;
+            return this;
+        }
+
         public DebugAPI build() {
             DebugAPI client    = new DebugAPI();
 
@@ -66,6 +75,7 @@ public class DebugAPI {
             client.json           = this.json;
             client.jsonWriter     = this.jsonWriter;
             client.outputFilePath = this.outputFilePath; // = "/app/logs/jessInitDB.json"; ???
+            client.outputPath     = this.outputPath;
 
             return client;
         }
@@ -88,5 +98,38 @@ public class DebugAPI {
             e.printStackTrace();
         }
     }
+
+
+    public void writeTemplateOutputFile(String path, String content) {
+        String[] dirs = path.split("/");
+        String fileName = "/" + dirs[dirs.length-1] + ".txt";
+
+        File outputFile = new File(this.outputPath + fileName);
+        try{
+            if(!outputFile.createNewFile()) {
+                outputFile.delete();
+                outputFile.createNewFile();
+                outputFile.setWritable(true);
+                outputFile.setReadable(true);
+                FileWriter outputWriter = new FileWriter(this.outputPath + fileName);
+                outputWriter.write(content);
+                outputWriter.close();
+            }
+            else{
+                outputFile.setWritable(true);
+                outputFile.setReadable(true);
+                FileWriter outputWriter = new FileWriter(this.outputPath + fileName);
+                outputWriter.write(content);
+                outputWriter.close();
+            }
+        }
+        catch (Exception e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+
+
+
 
 }

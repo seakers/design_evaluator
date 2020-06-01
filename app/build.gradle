@@ -48,6 +48,11 @@ dependencies {
 
     implementation 'com.google.guava:guava:28.2-jre'
     testImplementation 'junit:junit:4.12'
+
+    // OREKIT
+    compile 'org.orekit:orekit:10.0'
+    compile 'seakers:orekit:1.0'
+
 }
 
 application {

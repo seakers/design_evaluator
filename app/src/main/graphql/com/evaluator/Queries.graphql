@@ -1,8 +1,8 @@
 # INSTANTIATIONS
 
 
-query OrbitInformation($group_id: Int!, $problem_id: Int!) {
-    items: Orbit(where: {Group: {id: {_eq: $group_id}}}) {
+query OrbitInformation($problem_id: Int!) {
+    items: Orbit(where: {Join__Orbit_Attributes: {problem_id: {_eq: $problem_id}}, name: {_in: ["LEO-600-polar-NA", "SSO-600-SSO-AM", "SSO-600-SSO-DD", "SSO-800-SSO-AM", "SSO-800-SSO-DD"]}}) {
         id
         name
         attributes: Join__Orbit_Attributes(where: {problem_id: {_eq: $problem_id}}) {
@@ -14,6 +14,18 @@ query OrbitInformation($group_id: Int!, $problem_id: Int!) {
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 query LaunchVehicleInformation($group_id: Int, $problem_id: Int!) {
     items: Launch_Vehicle(where: {Group: {id: {_eq: $group_id}}}) {
@@ -42,7 +54,7 @@ query LaunchVehicleInformation($group_id: Int, $problem_id: Int!) {
 
 # ATTRIBUTES
 
-query MeasurementAttribute($group_id: Int) {
+query MeasurementAttribute($group_id: Int!) {
     items: Measurement_Attribute(where: {Group: {id: {_eq: $group_id}}}) {
         id
         name
@@ -148,7 +160,7 @@ query FuzzyAttribute($problem_id: Int) {
 
 
 query AggregationRule($problem_id: Int) {
-    items: Stakeholder_Needs_Panel(where: {problem_id: {_eq: 1}}) {
+    items: Stakeholder_Needs_Panel(where: {problem_id: {_eq: $problem_id}}) {
         name
         index_id
         weight
@@ -208,7 +220,7 @@ query RequirementRuleAttribute($problem_id: Int) {
 
 
 query CapabilityRule($group_id: Int!, $problem_id: Int!) {
-    items: Join__Instrument_Capability(where: {problem_id: {_eq: $problem_id}, group_id: {_eq: $group_id}}) {
+    items: Join__Instrument_Capability(where: {problem_id: {_eq: $problem_id}, group_id: {_eq: $group_id}, Instrument: {name: {_in: ["BIOMASS", "VIIRS", "SMAP_MWR", "SMAP_RAD", "CMIS"]}}}) {
         instrument: Instrument {
             name
         }
@@ -221,6 +233,7 @@ query CapabilityRule($group_id: Int!, $problem_id: Int!) {
         measurement_attribute_value: value
     }
 }
+
 
 
 

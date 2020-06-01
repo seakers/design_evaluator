@@ -1,0 +1,8 @@
+(defglobal ?*app_path* = "/home/gabe/repos/seakers/design_evaluator/app/problems/smap/clp")
+(import vassar.*)
+(import vassar.utils.*)
+(import vassar.result.*)
+(import java.util.*)
+(import jess.*)
+(defglobal ?*rulesMap* = (new java.util.HashMap))
+(set-reset-globals nil)

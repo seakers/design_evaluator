@@ -43,14 +43,18 @@ public class OrbitTemplateRequest extends TemplateRequest {
         this.orbit_header         = builder.orbit_header;
     }
 
+
+
+
     public TemplateResponse processRequest(QueryAPI api) {
         try {
             // QUERY
             List<OrbitInformationQuery.Item> items = api.orbitQuery();
 
-            //items.get(1).attribute().get(1).attribute().name();
 
-            Map<String, Object> context = new HashMap<>();
+
+
+            this.problemBuilder.setOrbitList(items);
 
             // BUILD CONTEXT
             this.context.put("template_header", this.template_header);

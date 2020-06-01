@@ -29,7 +29,7 @@ public class CapabilityRuleTemplateRequest extends TemplateRequest {
 
 
 
-    private class CapabilityRules{
+    public class CapabilityRules{
 
         private List<CapabilityRuleQuery.Item>      items;
         public  ArrayList<Instrument>               instruments;
@@ -60,7 +60,7 @@ public class CapabilityRuleTemplateRequest extends TemplateRequest {
             return this.instruments;
         }
 
-        private class Instrument{
+        public class Instrument{
             public String                                               name;
             public ArrayList<Measurement>                               measurements;
             public HashMap<String, ArrayList<CapabilityRuleQuery.Item>> measurement_partition;
@@ -92,7 +92,7 @@ public class CapabilityRuleTemplateRequest extends TemplateRequest {
 
         }
 
-        private class Measurement{
+        public class Measurement{
             public class MPair{
                 public String key;
                 public String value;
@@ -128,6 +128,8 @@ public class CapabilityRuleTemplateRequest extends TemplateRequest {
             List<CapabilityRuleQuery.Item> items              = api.capabilityRuleQuery();
             CapabilityRules rules                             = new CapabilityRules(items);
             ArrayList<CapabilityRules.Instrument> instruments = rules.buildRules();
+
+            this.problemBuilder.setInstrumentMeasurementData(instruments);
 
             this.context.put("items", instruments);
             this.template.evaluate(this.writer, this.context);

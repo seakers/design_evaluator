@@ -9,6 +9,7 @@ import vassar.database.service.QueryAPI;
 import vassar.database.template.TemplateRequest;
 import vassar.database.template.TemplateResponse;
 import vassar.database.template.response.BatchTemplateResponse;
+import vassar.problem.Problem;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -47,10 +48,12 @@ public class RequirementRuleAttributeTemplateRequest extends TemplateRequest {
         public String subobj;
         public HashMap<String, Integer> subobjRuleCount;
         public ArrayList<Rule> rules;
+        public Problem.Builder problemBuilder;
 
-        public RequirementRules(){
+        public RequirementRules(Problem.Builder problemBuilder){
             subobjRuleCount = new HashMap<>();
             rules           = new ArrayList<>();
+            this.problemBuilder  = problemBuilder;
         }
 
         public void addRule(RequirementRuleAttributeQuery.Item item){
@@ -68,7 +71,7 @@ public class RequirementRuleAttributeTemplateRequest extends TemplateRequest {
 
             // BUILD AND ADD RULE
             rules.add(
-                    new Rule(item, numAttrib)
+                    new Rule(item, numAttrib, this.problemBuilder)
             );
         }
 
@@ -88,7 +91,7 @@ public class RequirementRuleAttributeTemplateRequest extends TemplateRequest {
             public String naFuzzyString;
 
 
-            public Rule(RequirementRuleAttributeQuery.Item item, int numAttrib){
+            public Rule(RequirementRuleAttributeQuery.Item item, int numAttrib, Problem.Builder problemBuilder){
 
                 subobj = currentSubobj = item.objective().name();
                 index      = subobj.split("-",2)[1];
@@ -107,7 +110,7 @@ public class RequirementRuleAttributeTemplateRequest extends TemplateRequest {
                 justif     =  StringEscapeUtils.unescapeHtml4(item.justification()).replaceAll("&lt;", "<").replaceAll("&gt;", ">");
                 this.numAttrib  = Integer.toString(numAttrib);
 
-                GlobalScope.subobjectivesToMeasurements.put(currentSubobj, param);
+                problemBuilder.subobjectivesToMeasurements.put(currentSubobj, param);
             }
 
             public String arrayListToString(ArrayList<String> ary) {
@@ -134,7 +137,7 @@ public class RequirementRuleAttributeTemplateRequest extends TemplateRequest {
     // PROCESS REQUEST
     public TemplateResponse processRequest(QueryAPI api) {
         try {
-            RequirementRules  rules = new RequirementRules();
+            RequirementRules  rules = new RequirementRules(this.problemBuilder);
 
             // QUERY
             List<RequirementRuleAttributeQuery.Item> items = api.requirementRuleAttributeQuery();

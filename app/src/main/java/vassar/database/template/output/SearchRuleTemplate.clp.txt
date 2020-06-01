@@ -1,0 +1,1 @@
+/home/gabe/repos/seakers/design_evaluator/app/src/main/java/vassar/database/template/defs/SearchRuleTemplate.clp

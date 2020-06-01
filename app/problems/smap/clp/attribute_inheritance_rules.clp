@@ -37,7 +37,7 @@
     )
 
 (deffunction get-instrument-mass (?instr)
-    ;(printout t "get-instrument-mass " ?instr (str-length ?instr) crlf)
+    (printout t "get-instrument-mass " ?instr (str-length ?instr) crlf)
     (bind ?result (run-query* search-instrument-by-name ?instr))
     (?result next)
     (return (?result getDouble m))
@@ -58,6 +58,7 @@
     )
 
 (deffunction get-instrument-datarate (?instr)
+    (printout t "get-instrument-datarate " ?instr (str-length ?instr) crlf)
     (bind ?result (run-query* search-instrument-by-name ?instr))
     (?result next)
     (return (?result getDouble rb))

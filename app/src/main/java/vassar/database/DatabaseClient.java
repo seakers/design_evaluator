@@ -7,6 +7,7 @@ import vassar.database.service.DebugAPI;
 import vassar.database.service.QueryAPI;
 import vassar.database.template.TemplateRequest;
 import vassar.database.template.TemplateResponse;
+import vassar.problem.Problem;
 
 
 public class DatabaseClient {
@@ -51,10 +52,18 @@ public class DatabaseClient {
         }
     }
 
-    public TemplateResponse processTemplateRequest(TemplateRequest request) {
+    public TemplateResponse processTemplateRequest(TemplateRequest request, Problem.Builder problemBuilder) {
+
+        // PASS PROBLEM
+        request.setProblemBuilder(problemBuilder);
+        String key = request.getTemplateFilePath();
 
         // PROCESS REQUEST
-        return request.processRequest(this.queryAPI);
+        TemplateResponse response = request.processRequest(this.queryAPI);
+        System.out.println(key);
+        this.debugAPI.writeTemplateOutputFile(key, response.getTemplateString());
+
+        return response;
     }
 
     public void writeDebugInfo() {

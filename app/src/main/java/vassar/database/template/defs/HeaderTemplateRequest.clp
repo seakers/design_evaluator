@@ -1,5 +1,7 @@
 (defglobal ?*app_path* = "{{appPath}}")
-(import seakers.vassar.*)
+(import vassar.*)
+(import vassar.utils.*)
+(import vassar.result.*)
 (import java.util.*)
 (import jess.*)
 (defglobal ?*rulesMap* = (new java.util.HashMap))

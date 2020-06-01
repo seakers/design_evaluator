@@ -18,6 +18,7 @@ import io.reactivex.Observable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class QueryAPI {
 
@@ -69,7 +70,6 @@ public class QueryAPI {
     // QUERIES
     public List<OrbitInformationQuery.Item> orbitQuery(){
         OrbitInformationQuery orbitQuery = OrbitInformationQuery.builder()
-                                                                .group_id(this.group_id)
                                                                 .problem_id(this.problem_id)
                                                                 .build();
         ApolloCall<OrbitInformationQuery.Data>           apolloCall  = this.apollo.query(orbitQuery);
@@ -93,7 +93,7 @@ public class QueryAPI {
                 .build();
         ApolloCall<MeasurementAttributeQuery.Data>           apolloCall  = this.apollo.query(maQuery);
         Observable<Response<MeasurementAttributeQuery.Data>> observable  = Rx2Apollo.from(apolloCall);
-        return observable.blockingFirst().getData().items();
+        return Objects.requireNonNull(observable.blockingFirst().getData()).items();
     }
 
     public List<InstrumentAttributeQuery.Item> instrumentAttributeQuery(){

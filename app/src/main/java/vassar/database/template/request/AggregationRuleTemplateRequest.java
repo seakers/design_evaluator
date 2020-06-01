@@ -32,6 +32,8 @@ public class AggregationRuleTemplateRequest extends TemplateRequest {
             // QUERY
             List<AggregationRuleQuery.Item> items = api.aggregationRuleQuery();
 
+            this.problemBuilder.setAggregationRules(items);
+
             this.context.put("items", items);
             this.template.evaluate(this.writer, this.context);
 
