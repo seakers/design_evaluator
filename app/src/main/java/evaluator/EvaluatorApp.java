@@ -4,6 +4,7 @@
 package evaluator;
 
 import jess.Userfunction;
+import seakers.orekit.util.OrekitConfig;
 import vassar.GlobalScope;
 import vassar.VassarClient;
 import vassar.database.DatabaseClient;
@@ -27,6 +28,8 @@ public class EvaluatorApp {
 
     public static void main(String[] args) {
         System.out.println("os.name: "+System.getProperty("orekit.coveragedatabase"));
+        System.out.println("os.name: "+System.getProperty("user.dir"));
+        System.setProperty("orekit.coveragedatabase", "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/coverage/orekit/CoverageDatabase");
 
 
 
@@ -37,21 +40,25 @@ public class EvaluatorApp {
 //      |  | |  |\   | |  |     |  |
 //      |__| |__| \__| |__|     |__|
 
+
+        OrekitConfig.init(1, "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/coverage/orekit");
+
         GlobalScope.measurementsToSubobjectives = new HashMap<>();
         GlobalScope.subobjectivesToMeasurements = new HashMap<>();
 
+        String rootPath = "/Users/gabeapaza/repositories/seakers/design_evaluator";
 
 
-        String jessAppFuncPath    = "/home/gabe/repos/seakers/design_evaluator/app/ptypes/functions";
-        String outputFilePath     = "/home/gabe/repos/seakers/design_evaluator/app/logs/dbOutput.json";
-        String outputPath         = "/home/gabe/repos/seakers/design_evaluator/app/src/main/java/vassar/database/template/output";
-        String graphqlEndpoint    = "http://localhost:6001/v1/graphql";
+        String jessAppFuncPath    = rootPath + "/app/ptypes/functions";
+        String outputFilePath     = rootPath + "/app/debug/dbOutput.json";
+        String outputPath         = rootPath + "/app/src/main/java/vassar/database/template/output";
+        String graphqlEndpoint    = "http://localhost:6002/v1/graphql";
         String localstackEndpoint = "http://localhost:4576";
-        String apollo_url         = "http://localhost:6001/v1/graphql";
+        String apollo_url         = "http://localhost:6002/v1/graphql";
         boolean debug             = true;
 
         int group_id   = 1;
-        int problem_id = 4;
+        int problem_id = 5;
 
         ArrayList<Userfunction> userFuncs = new ArrayList<>() {{
             add( new SameOrBetter() );
@@ -59,17 +66,11 @@ public class EvaluatorApp {
             add( new Worsen() );
         }};
 
-        ArrayList<String> batchFuncs = new ArrayList<>() {{
-            add("/home/gabe/repos/seakers/design_evaluator/app/ptypes/functions/update-objective-variable.clp");
-            add("/home/gabe/repos/seakers/design_evaluator/app/ptypes/functions/ContainsRegion.clp");
-            add("/home/gabe/repos/seakers/design_evaluator/app/ptypes/functions/ContainsBands.clp");
-        }};
-
 
         // -----> JESS REQUESTS <-----
-        String jessGlobalTempPath = "/home/gabe/repos/seakers/design_evaluator/app/src/main/java/vassar/database/template/defs";
-        String jessGlobalFuncPath = "/home/gabe/repos/seakers/design_evaluator/app/ptypes/functions";
-        String jessAppPath        = "/home/gabe/repos/seakers/design_evaluator/app/problems/smap/clp";
+        String jessGlobalTempPath = rootPath + "/app/src/main/java/vassar/database/template/defs";
+        String jessGlobalFuncPath = rootPath + "/app/ptypes/functions";
+        String jessAppPath        = rootPath + "/app/problems/smap/clp";
         String requestMode        = "CRISP-ATTRIBUTES";
         Requests requests = new Requests.Builder()
                                         .setGlobalTemplatePath(jessGlobalTempPath)

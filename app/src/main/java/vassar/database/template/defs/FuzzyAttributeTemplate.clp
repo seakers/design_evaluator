@@ -1,24 +1,30 @@
 
 
-(defrule FUZZY::numerical-to-fuzzy-{{item.name()}}
+{% for item in items %}
 
-    ?m <- ({{template}}
+    ;;; BEGIN FUZZY ATTRIBUTE RULE: {{item.attributeName}} ;;;
 
-{% if item.parameter().equalsIgnoreCase("all") %}
-            ({{item.name()}}# ?num&~nil)
-{% else %}
-            (Parameter "{{item.parameter()}}")
-            ({{item.name().substring(0, item.name().length() - 1 )}}# ?num&~nil)
-{% endif %}
-    ({{item.name()}} nil)
-    (factHistory ?fh))
-    =>
+    (defrule FUZZY::numerical-to-fuzzy-{{item.attributeName}}
 
+        ?m <- (REQUIREMENTS::Measurement
 
-    (bind ?value (numerical-to-fuzzy
-                    ?num
-                    (create${% for value in item.values() %} {{value.value()}}{% endfor %})
-                    (create${% for value in item.values() %} {{value.minimum()}}{% endfor %})
-                    (create${% for value in item.values() %} {{value.maximum()}}{% endfor %})))
-    (modify ?m ({{item.name()}} ?value) (factHistory (str-cat "{R" (?*rulesMap* get FUZZY::numerical-to-fuzzy-{{item.name()}}) " " ?fh "}")))
-)
+    {% if item.parameter.equalsIgnoreCase("all") %}
+                ({{item.attributeName}}# ?num&~nil)
+    {% else %}
+                (Parameter "{{item.parameter}}")
+                ({{item.shortAttributeName}}# ?num&~nil)
+    {% endif %}
+        ({{item.attributeName}} nil)
+        (factHistory ?fh))
+
+        =>
+
+        (bind ?value (numerical-to-fuzzy
+                        ?num
+                        (create$ {{item.valueList}})
+                        (create$ {{item.minList}})
+                        (create$ {{item.maxList}})))
+        (modify ?m ({{item.attributeName}} ?value) (factHistory (str-cat "{R" (?*rulesMap* get FUZZY::numerical-to-fuzzy-{{item.attributeName}}) " " ?fh "}")))
+    )
+
+{% endfor %}

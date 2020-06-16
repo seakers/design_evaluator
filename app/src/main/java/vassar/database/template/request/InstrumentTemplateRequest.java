@@ -2,10 +2,16 @@ package vassar.database.template.request;
 
 import com.evaluator.InstrumentQuery;
 import com.evaluator.LaunchVehicleInformationQuery;
+import com.evaluator.MeasurementAttributeQuery;
+import vassar.GlobalScope;
 import vassar.database.service.QueryAPI;
 import vassar.database.template.TemplateRequest;
 import vassar.database.template.TemplateResponse;
+import vassar.jess.attribute.AttributeBuilder;
+import vassar.jess.attribute.EOAttribute;
 
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 
 public class InstrumentTemplateRequest extends TemplateRequest {
@@ -76,5 +82,6 @@ public class InstrumentTemplateRequest extends TemplateRequest {
         return null;
 
     }
+
 
 }

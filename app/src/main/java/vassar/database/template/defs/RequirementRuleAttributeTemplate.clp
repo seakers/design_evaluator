@@ -1,40 +1,66 @@
-{# reqRule #}
+ {# rule.subobjective #}
+ {# rule.measurement #}
+ {# rule.NAstring #}
+ {# rule.index: row[0].split("-",2)[1] #}
+ {# rule.parent: row[0].split("-",2)[0] #}
 
-{# subobj / rule.currentSubobj --> row[0] #}
-{# index  --> row[0].split("-",2)[1] #}
-{# parent --> row[0].split("-",2)[0] #}
-{# param --> row[1] #}
-{# m.toJessList(thresholds) --> row[4] #}
-{# attrib --> type row[3] + threshold row[4] + scores row[5] #}
-{# numAttrib -> index of attribute for that rule #}
-{# StringUtils.repeat("N-A ",numAttrib) #}
-{# justif --> row[6] #}
-{# attribs --> row[2] concat for rule #}
-
-
- {% for rule in rules.rules %}
+ {# rule.attributes - list of object: attribute #}
+ {# attribute.name #}
+ {# attribute.thresholds #}
+ {# attribute.scores #}
+ {# attribute.justification #}
 
 
-    {# lhs #}
-    (defrule REQUIREMENTS::{{rule.subobj}}-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom)  (power-duty-cycle# ?pc) (data-rate-duty-cycle# ?dc)  (Parameter "{{rule.param}}")
-    ({{rule.attrib}} ?val{{rule.numAttrib}}&~nil)
+  {% for rule in rules %}
 
-    {# rhs0 #}
-     ) => (bind ?reason "") (bind ?new-reasons (create$ {{rule.naString}}))
+        ;;; BEGIN RULE: {{rule.subobjective}} ;;;
 
-    {# rhs #}
-     (bind ?x{{rule.numAttrib}} (nth$ (find-bin-num ?val{{rule.numAttrib}} {{m.toJessList(rule.thresholds)}}){{m.toJessList(scores)}}))
+        (defrule REQUIREMENTS::{{rule.subobjective}}-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom)  (power-duty-cycle# ?pc) (data-rate-duty-cycle# ?dc)
+        (Parameter "{{rule.measurement}}")
+        {% for attribute in rule.attributes %}({{attribute.name}} ?val{{loop.index + 1}}&~nil) {% endfor %})
 
-     {% autoescape false %}
-     (if (< ?x{{rule.numAttrib}} 1.0) then (bind ?new-reasons (replace$  ?new-reasons {{rule.numAttrib}} {{rule.numAttrib}} "{{rule.justif}}" )) (bind ?reason (str-cat ?reason  "{{rule.justif}}")))
-    {% endautoescape %}
+        =>
 
-    {# rhs2 #}
-     (bind ?list (create$ ?x{{rule.numAttrib}} ))
+        (bind ?reason "") (bind ?new-reasons (create$ {{rule.NAstring}}))
+
+        {% autoescape false %}
+        {% for attribute in rule.attributes %}
+            (bind ?x{{loop.index + 1}} (nth$ (find-bin-num ?val{{loop.index + 1}}  (create$ {{attribute.thresholds}}) ) (create$ {{attribute.scores}}))) (if (< ?x{{loop.index + 1}} 1.0) then (bind ?new-reasons (replace$  ?new-reasons {{loop.index + 1}} {{loop.index + 1}} "{{attribute.justification}}" )) (bind ?reason (str-cat ?reason  "{{attribute.justification}}")))
+        {% endfor %}
+        {% endautoescape %}
+
+        (bind ?list (create$ {% for attribute in rule.attributes %} ?x{{loop.index + 1}} {% endfor %}))
+
+        (assert (AGGREGATION::SUBOBJECTIVE (id {{rule.subobjective}}) (attributes {% for attribute in rule.attributes %} {{attribute.name}} {% endfor %}) (index {{rule.index}}) (parent {{rule.parent}}) (attrib-scores ?list) (satisfaction (*$ ?list)) (reasons ?new-reasons) (satisfied-by ?whom) (reason ?reason ) (requirement-id (?m getFactId)) (factHistory (str-cat "{R" (?*rulesMap* get REQUIREMENTS::{{rule.subobjective}}-attrib) " A" (call ?m getFactId) "}")))))
+
+  {% endfor %}
 
 
-     (assert (AGGREGATION::SUBOBJECTIVE (id {{rule.currentSubobj}}) (attributes {{rule.attribs}}) (index {{rule.index}}) (parent {{rule.parent}} ) (attrib-scores ?list) (satisfaction (*$ ?list)) (reasons ?new-reasons) (satisfied-by ?whom) (reason ?reason ) (requirement-id (?m getFactId))
-     (factHistory (str-cat "{R" (?*rulesMap* get REQUIREMENTS::{{rule.subobj}}-attrib) " A" (call ?m getFactId) "}")) )) )
 
 
- {% endfor %}
+  (deffacts REQUIREMENTS::init-subobjectives
+
+  {% for rule in rules %}
+    (AGGREGATION::SUBOBJECTIVE (satisfaction 0.0) (id {{rule.subobjective}}) (index {{rule.index}}) (parent {{rule.parent}}) (reasons (create$ {{rule.NAstring}})) {%- if loop.index == (loop.length - 1) %}(requirement-id -1){% endif %} (factHistory F0))
+  {% endfor %}
+
+  )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

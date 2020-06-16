@@ -108,9 +108,11 @@ public abstract class AbstractArchitectureEvaluator implements Callable<Result> 
 
 
     protected Result evaluatePerformance(Problem params, Rete r, AbstractArchitecture arch, QueryBuilder qb) {
+        System.out.println("----- EVALUATING PERFORMANCE");
 
         Result result = new Result();
         try {
+
             r.reset();
             assertMissions(params, r, arch);
 
@@ -118,8 +120,8 @@ public abstract class AbstractArchitectureEvaluator implements Callable<Result> 
             r.eval("(defadvice before (create$ >= <= < >) (foreach ?xxx $?argv (if (eq ?xxx nil) then (return FALSE))))");
             r.eval("(defadvice before (create$ sqrt + * **) (foreach ?xxx $?argv (if (eq ?xxx nil) then (bind ?xxx 0))))");
 
-            //r.eval("(watch rules)");
-            //r.eval("(facts)");
+            r.eval("(watch rules)");
+            r.eval("(facts)");
 
             r.setFocus("MANIFEST0");
             r.run();
@@ -164,17 +166,18 @@ public abstract class AbstractArchitectureEvaluator implements Callable<Result> 
                 // Assign -1 if unmatched. Otherwise, assign the corresponding index
                 revTimePrecomputedIndex[i] = matchedIndex;
             }
+//            System.out.println("--- Revolution Time " + revTimePrecomputedIndex);
+//            System.out.println("--- Measurements to Instruments Keyset " + params.measurementsToInstruments.keySet());
 
             for (String param: params.measurementsToInstruments.keySet()) {
-                System.out.println("----------> update-fov");
-                System.out.println(params.measurementsToInstruments.keySet());
-                System.out.println(param);
 
                 Value v = r.eval("(update-fovs " + param + " (create$ " + MatlabFunctions.stringArraytoStringWithSpaces(params.getOrbitList()) + "))");
-                System.out.println("X - " + RU.getTypeName(v.type()));
-                System.out.println(v);
+                // System.out.println("X - " + RU.getTypeName(v.type()) + " " + v);
 
                 if (RU.getTypeName(v.type()).equalsIgnoreCase("LIST")) {
+
+                    //System.out.println("------- LIST -------");
+
 
                     ValueVector thefovs = v.listValue(r.getGlobalContext());
                     String[] fovs = new String[thefovs.size()];
@@ -182,6 +185,8 @@ public abstract class AbstractArchitectureEvaluator implements Callable<Result> 
                         int tmp = thefovs.get(i).intValue(r.getGlobalContext());
                         fovs[i] = String.valueOf(tmp);
                     }
+                    //System.out.println("The fovs: " + thefovs);
+                    //System.out.println("fovs: " + fovs);
 
                     boolean recalculateRevisitTime = false;
                     for(int i = 0; i < fovs.length; i++){
@@ -297,12 +302,16 @@ public abstract class AbstractArchitectureEvaluator implements Callable<Result> 
 
             //////////////////////////////////////////////////////////////
 
-//            if (this.debug) {
-//                ArrayList<Fact> partials = qb.makeQuery("REASONING::partially-satisfied");
-//                ArrayList<Fact> fulls = qb.makeQuery("REASONING::fully-satisfied");
-//                fulls.addAll(partials);
-//                //result.setExplanations(fulls);
-//            }
+            this.debug = true;
+            if (this.debug) {
+                ArrayList<Fact> partials = qb.makeQuery("REASONING::partially-satisfied");
+                ArrayList<Fact> fulls = qb.makeQuery("REASONING::fully-satisfied");
+                fulls.addAll(partials);
+                System.out.println("----- DEBUG");
+                System.out.println(partials);
+                System.out.println(fulls);
+                //result.setExplanations(fulls);
+            }
         }
 
 
@@ -332,7 +341,7 @@ public abstract class AbstractArchitectureEvaluator implements Callable<Result> 
             // General and panel scores
             ArrayList<Fact> vals = qb.makeQuery("AGGREGATION::VALUE");
             Fact val = vals.get(0);
-            System.out.println("-----------------> DDDDD");
+            System.out.println("-----------------> GETTING SCIENCE VALUE");
             System.out.println(r.getGlobalContext());
             System.out.println(val);
             science = val.getSlotValue("satisfaction").floatValue(r.getGlobalContext());
@@ -400,9 +409,14 @@ public abstract class AbstractArchitectureEvaluator implements Callable<Result> 
         }
         Result theresult = new Result(arch, science, cost, fuzzy_science, fuzzy_cost, subobj_scores, obj_scores,
                 panel_scores, subobj_scores_map);
+
+        this.debug = true;
         if (this.debug) {
             theresult.setCapabilities(qb.makeQuery("REQUIREMENTS::Measurement"));
             theresult.setExplanations(explanations);
+            System.out.println("--- debug2");
+            System.out.println(theresult.capabilities);
+            System.out.println(theresult.explanations);
         }
 
         return theresult;

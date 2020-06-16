@@ -66,6 +66,8 @@ public class Architecture extends AbstractArchitecture{
     // Utils
     private boolean[][] booleanString2Matrix(String bitString) {
         boolean[][] mat = new boolean[problem.getNumOrbits()][problem.getNumInstr()];
+        System.out.println("ORBITS: " + problem.getNumOrbits());
+        System.out.println("INSTRUMENTS: " + problem.getNumInstr());
         for (int i = 0; i < problem.getNumOrbits(); i++) {
             for (int j = 0; j < problem.getNumInstr(); j++) {
                 String b = bitString.substring(problem.getNumInstr() *i + j,problem.getNumInstr()*i + j + 1);

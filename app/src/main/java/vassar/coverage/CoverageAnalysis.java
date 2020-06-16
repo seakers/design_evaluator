@@ -6,6 +6,10 @@ import java.util.Locale;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.orekit.geometry.fov.CircularFieldOfView;
 import seakers.orekit.analysis.Analysis;
 import seakers.orekit.constellations.Walker;
 import seakers.orekit.event.*;
@@ -20,7 +24,7 @@ import seakers.orekit.coverage.analysis.AnalysisMetric;
 import seakers.orekit.coverage.analysis.GroundEventAnalyzer;
 
 import static seakers.orekit.object.CoverageDefinition.GridStyle.EQUAL_AREA;
-import seakers.orekit.object.fieldofview.NadirSimpleConicalFOV;
+//import seakers.orekit.object.fieldofview.NadirSimpleConicalFOV;
 import org.hipparchus.geometry.euclidean.threed.Vector3D;
 import org.hipparchus.stat.descriptive.DescriptiveStatistics;
 import org.hipparchus.util.FastMath;
@@ -93,7 +97,7 @@ public class CoverageAnalysis {
             pathBuffer.append(File.separator);
             pathBuffer.append("resources");
         }
-        System.out.println("---- AAAAA " + pathBuffer.toString());
+        // System.out.println("---- AAAAA " + pathBuffer.toString());
         System.setProperty(DataProvidersManager.OREKIT_DATA_PATH, pathBuffer.toString());
 
         // Default start date and end date with 7-day run time
@@ -244,8 +248,22 @@ public class CoverageAnalysis {
         double a = Constants.WGS84_EARTH_EQUATORIAL_RADIUS+h; //semi-major axis
         double i = FastMath.toRadians(inclination); // inclination given in deg
 
+
+        // Supported FOV: conical / rectangular
+
+        // 1. Create either a curcular or rectangular FOV
+        // CircularFieldOfView
+        // PolygonalFieldOfView
+
+        CircularFieldOfView fov = new CircularFieldOfView(Vector3D.PLUS_K, FastMath.toRadians(fieldOfView), 0.0);
+
+        // 2. Give FOV an attitude provider, either nadir or account for off nadir angle
+
+
+
+
+
         //define instruments and payload
-        NadirSimpleConicalFOV fov = new NadirSimpleConicalFOV(FastMath.toRadians(fieldOfView), earthShape);
         ArrayList<Instrument> payload = new ArrayList<>();
         Instrument view1 = new Instrument("view1", fov, 100, 100);
         payload.add(view1);
@@ -259,7 +277,7 @@ public class CoverageAnalysis {
         //number of phases
         int f = 0;
 
-        Walker walker = new Walker("walker1", payload, a, i, t, p, f, inertialFrame, startDate, mu, FastMath.toRadians(raan), 0.0);
+        Walker walker = new Walker("walker1", payload, a, i, t, p, f, inertialFrame, earthShape, startDate, mu, FastMath.toRadians(raan), 0.0);
 
         //define coverage params
         //this is coverage with 20 granularity and equal area grid style
@@ -295,7 +313,7 @@ public class CoverageAnalysis {
         }
         catch (Exception ex) {
 //            Logger.getLogger(CoverageAnalysis.class.getName()).log(Level.SEVERE, null, ex);
-
+//
 //            System.out.println("Fail: fov: " + fieldOfView + ", inc: " + inclination + ", alt: " + altitude + ", nSat: " + numSats +
 //                    ", nPlane: " + numPlanes + ", raan: " + raan );
 
@@ -402,6 +420,7 @@ public class CoverageAnalysis {
                     propertiesPropagator.setProperty("orekit.propagator.solarpressure", "true");
                     propertiesPropagator.setProperty("orekit.propagator.solararea", "0.058");
 
+                    // PropagatorFactory pf=new PropagatorFactory(PropagatorType.J2,propertiesPropagator);
                     PropagatorFactory pf=new PropagatorFactory(PropagatorType.NUMERICAL,propertiesPropagator);
                     Propagator prop=pf.createPropagator(SSO, 0);
                     SpacecraftState s=prop.propagate(tempStartDate, tempEndDate);

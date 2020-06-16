@@ -31,17 +31,6 @@ public class QueryBuilder {
 
     }
 
-    public void computeQueries(Problem params){
-        HashMap<String,Fact> db_instruments = new HashMap<>();
-        for (int i = 0; i < params.getNumInstr(); i++) {
-            String instr = params.getInstrumentList()[i];
-            ArrayList<Fact> facts = this.makeQuery("DATABASE::Instrument (Name " + instr + ")");
-            Fact f = facts.get(0);
-            db_instruments.put(instr, f);
-        }
-        this.addPrecomputedQuery("DATABASE::Instrument", db_instruments);
-    }
-
     public void addPrecomputedQuery(String key, HashMap<String, Fact> hm) {
         this.precomputedQueries.put(key, hm);
     }

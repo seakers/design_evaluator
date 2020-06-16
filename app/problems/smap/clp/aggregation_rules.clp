@@ -7,6 +7,7 @@
     (test (< (nth$ ?index $?scors) ?sat))
     =>
     (bind ?new-scors (replace$ $?scors ?index ?index ?sat))
+    (printout t "debug: get-subobjective-scores: " ?index " " $?scors " " ?sat " " ?papa crlf)
     (modify ?obj (subobj-scores ?new-scors) (factHistory (str-cat "{R" (?*rulesMap* get AGGREGATION::get-subobjective-scores) " " ?fh " S" (call ?sub getFactId) "}")))
     )
 
@@ -18,6 +19,7 @@
 	?obj <- (AGGREGATION::OBJECTIVE (satisfaction nil) (subobj-scores $?scors) (weights $?weights) (factHistory ?fh))
     (test (no-nils $?scors))
     =>
+    (printout t "debug: compute-objective-scores: " $?scors " " $?weights " " (dot-product$ $?weights $?scors) crlf)
     (modify ?obj (satisfaction (dot-product$ $?weights $?scors)) (factHistory (str-cat "{R" (?*rulesMap* get AGGREGATION::compute-objective-scores) " " ?fh "}")))
     )
 

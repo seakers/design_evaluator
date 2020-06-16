@@ -46,7 +46,11 @@ public class Consumer implements Runnable{
 
         // From SQS message
         // Design ID: D499; Science: 0.6900; Cost ($M): 3298.04
-        String bitString = "1000000010010011001000110";
+        // String bitString = "1000000010010011001000110";
+
+        // Performance Score: 0.12438011111111111, Cost: 340.4517345093525
+        String bitString = "0000000010000000000000000";
+
 
         Result result = this.client.evaluateArchitecture(bitString);
         System.out.println("----------- COST");

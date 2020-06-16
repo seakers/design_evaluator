@@ -10,7 +10,7 @@
 
 {% for item in items %}
 {% for objec in item.objectives() %}
- (AGGREGATION::OBJECTIVE (id {{objec.name()}}) (index {{loop.index + 1}}) (subobj-fuzzy-scores (repeat$ -1.0 {{objec.subobjectives().size()}})) (subobj-scores (repeat$ -1.0 {{objec.subobjectives().size()}})) (weights (create$ {% for subobjec in objec.subobjectives() %} {{subobjec.weight()}} {% endfor %})) (factHistory F0))
+ (AGGREGATION::OBJECTIVE (id {{objec.name()}}) (parent {{item.index_id()}}) (index {{loop.index + 1}}) (subobj-fuzzy-scores (repeat$ -1.0 {{objec.subobjectives().size()}})) (subobj-scores (repeat$ -1.0 {{objec.subobjectives().size()}})) (weights (create$ {% for subobjec in objec.subobjectives() %} {{subobjec.weight()}} {% endfor %})) (factHistory F0))
 {% endfor %}
 {% endfor %}
 

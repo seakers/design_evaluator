@@ -57,6 +57,9 @@ public class SynergyRuleTemplateRequest extends TemplateRequest {
     public TemplateResponse processRequest(QueryAPI api) {
         try {
 
+            System.out.println("---------- GLOBAL MEASUREMENT TO SUBOBJECTIVES");
+            System.out.println(GlobalScope.measurementsToSubobjectives);
+
             SynergyRules rules = new SynergyRules();
 
 
@@ -68,9 +71,8 @@ public class SynergyRuleTemplateRequest extends TemplateRequest {
 
 
             return new TemplateResponse.Builder()
-                    .setTemplateString(
-                            this.writer.toString()
-                    ).build();
+                    .setTemplateString(this.writer.toString())
+                    .build();
         }
         catch (Exception e) {
             System.out.println("Error processing orbit template request: " +e.getClass() + " : " + e.getMessage());

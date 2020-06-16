@@ -13,7 +13,7 @@ public class Requests {
     public static class Builder {
 
         private String jessAppPath;
-        private String globalTemplatePath; // /home/gabe/repos/seakers/design_evaluator/app/src/main/java/vassar/database/template/defs
+        private String globalTemplatePath;
         private String globalFunctionPath;
         private String requestMode;
         private ArrayList<String> funcTemplates;
@@ -250,6 +250,11 @@ public class Requests {
                                 .templateFilePath(this.jessAppPath + "/cost_estimation_rules.clp")
                                 .build()
                 );
+                build.requests.add(
+                        new BatchFileTemplateRequest.Builder()
+                                .templateFilePath(this.jessAppPath + "/fuzzy_cost_estimation_rules.clp")
+                                .build()
+                );
             }
             build.requests.add(
                     new BatchFileTemplateRequest.Builder()
@@ -265,14 +270,14 @@ public class Requests {
             );
 
             // ---------- FUZZY ATTRIBUTE RULES
-//            build.requests.add(
-//                    new FuzzyAttributeTemplateRequest.Builder()
-//                            .applyExtension(new JessExtension())
-//                            .templateFilePath(this.globalTemplatePath + "/FuzzyAttributeTemplate.clp")
-//                            .build()
-//            );
+            build.requests.add(
+                    new FuzzyAttributeTemplateRequest.Builder()
+                            .applyExtension(new JessExtension())
+                            .templateFilePath(this.globalTemplatePath + "/FuzzyAttributeTemplate.clp")
+                            .build()
+            );
 
-            // 14 ---------- FUZZY ATTRIBUTE RULES
+            // 14 ---------- REQUIREMENT RULES
             if ( this.requestMode.equalsIgnoreCase("CRISP-ATTRIBUTES") ) {
                 build.requests.add(
                         new RequirementRuleAttributeTemplateRequest.Builder()
@@ -281,14 +286,14 @@ public class Requests {
                                 .build()
                 );
             }
-            else if ( this.requestMode.equalsIgnoreCase("FUZZY-ATTRIBUTES") ) {
-                build.requests.add(
-                        new RequirementRuleAttributeTemplateRequest.Builder()
-                                .templateFilePath(this.globalTemplatePath + "/FuzzyRequirementRuleAttributeTemplate.clp")
-                                .setWrapperTemplatePath(this.globalTemplatePath + "/FuzzyRequirementRuleAttributeTemplateWrapper.clp")
-                                .build()
-                );
-            }
+//            else if ( this.requestMode.equalsIgnoreCase("FUZZY-ATTRIBUTES") ) {
+//                build.requests.add(
+//                        new RequirementRuleAttributeTemplateRequest.Builder()
+//                                .templateFilePath(this.globalTemplatePath + "/FuzzyRequirementRuleAttributeTemplate.clp")
+//                                .setWrapperTemplatePath(this.globalTemplatePath + "/FuzzyRequirementRuleAttributeTemplateWrapper.clp")
+//                                .build()
+//                );
+//            }
 
             // 15 ---------- CAPABILITY RULES
             build.requests.add(
@@ -322,7 +327,7 @@ public class Requests {
                             .build()
             );
 
-            // 18 ---------- AD-HOC RULES
+            // 18 ---------- AD-HOC RULES: instruments
             build.requests.add(
                     new AdHocRuleTemplateRequest.Builder()
                             .templateFilePath(this.globalTemplatePath + "/AdHocRuleTemplate.clp")

@@ -60,6 +60,11 @@ query MeasurementAttribute($group_id: Int!) {
         name
         slot_type
         type
+        values: Join__Measurement_Attribute_Values {
+            Accepted_Value {
+                value
+            }
+        }
     }
 }
 
@@ -69,6 +74,11 @@ query InstrumentAttribute($group_id: Int) {
         name
         slot_type
         type
+        values: Join__Instrument_Attribute_Values {
+            Accepted_Value {
+                value
+            }
+        }
     }
 }
 

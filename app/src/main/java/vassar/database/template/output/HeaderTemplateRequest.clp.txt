@@ -1,4 +1,4 @@
-(defglobal ?*app_path* = "/home/gabe/repos/seakers/design_evaluator/app/problems/smap/clp")
+(defglobal ?*app_path* = "/Users/gabeapaza/repositories/seakers/design_evaluator/app/problems/smap/clp")
 (import vassar.*)
 (import vassar.utils.*)
 (import vassar.result.*)

@@ -6,20 +6,10 @@
 {% for instrument in items %}
 
     {# call #}
-    (defrule MANIFEST::{{instrument.name}}-init-can-measure (declare (salience -20)) ?this <- (CAPABILITIES::Manifested-instrument  (Name ?ins&{{instrument.name}})
-    (Id ?id) (flies-in ?miss) (Intent ?int) (Spectral-region ?sr) (orbit-type ?typ) (orbit-altitude# ?h) (orbit-inclination ?inc) (orbit-RAAN ?raan) (orbit-anomaly# ?ano) (Illumination ?il) (factHistory ?fh))
-    (not (CAPABILITIES::can-measure (instrument ?ins) (in-orbit ?miss) (can-take-measurements no))) =>
-    (assert (CAPABILITIES::can-measure (instrument ?ins) (orbit-type ?typ) (orbit-altitude# ?h) (orbit-inclination ?inc) (data-rate-duty-cycle# nil) (power-duty-cycle# nil)(orbit-RAAN ?raan)
-    (in-orbit (eval (str-cat ?typ "-" ?h "-" ?inc "-" ?raan))) (can-take-measurements yes) (reason "by default")
-    (copied-to-measurement-fact no)(factHistory (str-cat "{R" (?*rulesMap* get MANIFEST::{{instrument.name}}-init-can-measure) " A" (call ?this getFactId) "}")))))
+    (defrule MANIFEST::{{instrument.name}}-init-can-measure (declare (salience -20)) ?this <- (CAPABILITIES::Manifested-instrument  (Name ?ins&{{instrument.name}}) (Id ?id) (flies-in ?miss) (Intent ?int) (Spectral-region ?sr) (orbit-type ?typ) (orbit-altitude# ?h) (orbit-inclination ?inc) (orbit-RAAN ?raan) (orbit-anomaly# ?ano) (Illumination ?il) (factHistory ?fh)) (not (CAPABILITIES::can-measure (instrument ?ins) (in-orbit ?miss) (can-take-measurements no))) => (assert (CAPABILITIES::can-measure (instrument ?ins) (orbit-type ?typ) (orbit-altitude# ?h) (orbit-inclination ?inc) (data-rate-duty-cycle# nil) (power-duty-cycle# nil)(orbit-RAAN ?raan) (in-orbit (eval (str-cat ?typ "-" ?h "-" ?inc "-" ?raan))) (can-take-measurements yes) (reason "by default") (copied-to-measurement-fact no)(factHistory (str-cat "{R" (?*rulesMap* get MANIFEST::{{instrument.name}}-init-can-measure) " A" (call ?this getFactId) "}")))))
 
     {# call2 #}
-    (defrule CAPABILITIES-GENERATE::{{instrument.name}}-measurements ?this <- (CAPABILITIES::Manifested-instrument  (Name ?ins&{{instrument.name}})
-    (Id ?id) (flies-in ?miss) (Intent ?int) (orbit-string ?orb) (Spectral-region ?sr) (orbit-type ?typ) (orbit-altitude# ?h) (orbit-inclination ?inc) (orbit-RAAN ?raan) (orbit-anomaly# ?ano) (Illumination ?il) (factHistory ?fh1))
-    ?this2 <- (CAPABILITIES::can-measure (instrument ?ins) (in-orbit ?orb) (can-take-measurements yes) (data-rate-duty-cycle# ?dc-d) (power-duty-cycle# ?dc-p) (copied-to-measurement-fact no)(factHistory ?fh2)) =>
-    (if (and (numberp ?dc-d) (numberp ?dc-p)) then (bind ?*science-multiplier* (min ?dc-d ?dc-p)) else (bind ?*science-multiplier* 1.0))
-    (assert (CAPABILITIES::resource-limitations (data-rate-duty-cycle# ?dc-d) (power-duty-cycle# ?dc-p)
-    (factHistory (str-cat "{R" (?*rulesMap* get CAPABILITIES::{{instrument.name}}-measurements) " A" (call ?this getFactId) " A" (call ?this2 getFactId) "}"))))
+    (defrule CAPABILITIES-GENERATE::{{instrument.name}}-measurements ?this <- (CAPABILITIES::Manifested-instrument  (Name ?ins&{{instrument.name}}) (Id ?id) (flies-in ?miss) (Intent ?int) (orbit-string ?orb) (Spectral-region ?sr) (orbit-type ?typ) (orbit-altitude# ?h) (orbit-inclination ?inc) (orbit-RAAN ?raan) (orbit-anomaly# ?ano) (Illumination ?il) (factHistory ?fh1)) ?this2 <- (CAPABILITIES::can-measure (instrument ?ins) (in-orbit ?orb) (can-take-measurements yes) (data-rate-duty-cycle# ?dc-d) (power-duty-cycle# ?dc-p) (copied-to-measurement-fact no)(factHistory ?fh2)) => (if (and (numberp ?dc-d) (numberp ?dc-p)) then (bind ?*science-multiplier* (min ?dc-d ?dc-p)) else (bind ?*science-multiplier* 1.0)) (assert (CAPABILITIES::resource-limitations (data-rate-duty-cycle# ?dc-d) (power-duty-cycle# ?dc-p) (factHistory (str-cat "{R" (?*rulesMap* get CAPABILITIES::{{instrument.name}}-measurements) " A" (call ?this getFactId) " A" (call ?this2 getFactId) "}"))))
 
 
     {# MEASUREMENTS #}
@@ -29,6 +19,7 @@
         (assert (REQUIREMENTS::Measurement
 
 
+            (Parameter "{{measurement.name}}")
         {# MEASUREMENT ATTRIBUTE - MPair #}
         {% for attribute in measurement.attributes %}
             {% if (attribute.value.equalsIgnoreCase("nil")) %}{% else %}

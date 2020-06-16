@@ -45,7 +45,7 @@ public class CapabilityRuleTemplateRequest extends TemplateRequest {
                 // NEW INSTRUMENT
                 if (!this.instrument_partition.containsKey(item.instrument().name())) {
                     this.instrument_partition.put(item.instrument().name(), new ArrayList<>());
-                    this.instrument_partition.get(item.instrument().name()).add(item);
+                    // this.instrument_partition.get(item.instrument().name()).add(item);
                 }
                 this.instrument_partition.get(item.instrument().name()).add(item);
 
@@ -76,7 +76,7 @@ public class CapabilityRuleTemplateRequest extends TemplateRequest {
                     // NEW MEASUREMENT
                     if (!this.measurement_partition.containsKey(item.measurement().name())) {
                         this.measurement_partition.put(item.measurement().name(), new ArrayList<>());
-                        this.measurement_partition.get(item.measurement().name()).add(item);
+                        // this.measurement_partition.get(item.measurement().name()).add(item);
                     }
                     this.measurement_partition.get(item.measurement().name()).add(item);
                 }
@@ -126,7 +126,7 @@ public class CapabilityRuleTemplateRequest extends TemplateRequest {
         try {
             // QUERY
             List<CapabilityRuleQuery.Item> items              = api.capabilityRuleQuery();
-            CapabilityRules rules                             = new CapabilityRules(items);
+            CapabilityRules rules                             = new CapabilityRules(items); // Record all the instruments
             ArrayList<CapabilityRules.Instrument> instruments = rules.buildRules();
 
             this.problemBuilder.setInstrumentMeasurementData(instruments);

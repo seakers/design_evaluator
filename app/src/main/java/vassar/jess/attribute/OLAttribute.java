@@ -26,6 +26,11 @@ public class OLAttribute extends EOAttribute {
     @Override
     public int SameOrBetter(EOAttribute other) {
         // Since this is a Neutral List attribute:
+//        System.out.println("--- SAME OR BETTER");
+//        System.out.println(this.acceptedValues);
+//        System.out.println(this.value);
+//        System.out.println(other.acceptedValues);
+//        System.out.println(other.value);
         int z = 0;
         int value_this = this.acceptedValues.get(this.value);
         int value_other = other.acceptedValues.get(other.value);

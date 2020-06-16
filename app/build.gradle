@@ -50,8 +50,12 @@ dependencies {
     testImplementation 'junit:junit:4.12'
 
     // OREKIT
-    compile 'org.orekit:orekit:10.0'
+    compile 'org.orekit:orekit:10.1'
     compile 'seakers:orekit:1.0'
+
+    // APACHE COMMONS
+    compile 'org.apache.commons:commons-lang3:3.9'
+    compile 'org.apache.commons:commons-math3:3.6.1'
 
 }
 

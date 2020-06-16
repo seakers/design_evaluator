@@ -11,6 +11,7 @@ import vassar.database.template.TemplateResponse;
 import vassar.database.template.response.BatchTemplateResponse;
 import vassar.problem.Problem;
 
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,92 +43,114 @@ public class RequirementRuleAttributeTemplateRequest extends TemplateRequest {
         this.wrapperTemplatePath = builder.wrapperTemplatePath;
     }
 
+
+
+
+
     // REQUIREMENT RULE
     public class RequirementRules{
 
-        public String subobj;
-        public HashMap<String, Integer> subobjRuleCount;
-        public ArrayList<Rule> rules;
-        public Problem.Builder problemBuilder;
+        // This will hold the real rules
+        public HashMap<String, SubobjectiveRule> requirementRules;
 
-        public RequirementRules(Problem.Builder problemBuilder){
-            subobjRuleCount = new HashMap<>();
-            rules           = new ArrayList<>();
-            this.problemBuilder  = problemBuilder;
+        public RequirementRules(Problem.Builder problemBuilder, List<RequirementRuleAttributeQuery.Item> items){
+            requirementRules = new HashMap<>();
+
+            for(RequirementRuleAttributeQuery.Item item: items){
+                String subobjective = item.objective().name();
+
+                if(!requirementRules.containsKey(subobjective)){
+                    requirementRules.put(
+                            subobjective, new SubobjectiveRule(item, problemBuilder)
+                    );
+                }
+                else{
+                    requirementRules.get(subobjective).addAttribute(item);
+                }
+            }
         }
 
-        public void addRule(RequirementRuleAttributeQuery.Item item){
-            // RECORD RULE NUMBER FOR SUBOBJECTIVE
-            subobj     = item.objective().name();
-            int    numAttrib  = 1; // one-up numbering
-
-            if (!subobjRuleCount.containsKey(subobj)) {
-                numAttrib  = 1;
+        public ArrayList<SubobjectiveRule> getRules(){
+            ArrayList<SubobjectiveRule> rules = new ArrayList<>();
+            for (String key: requirementRules.keySet()){
+                rules.add(
+                        requirementRules.get(key)
+                );
             }
-            else {
-                numAttrib  = subobjRuleCount.get(subobj);
-            }
-            subobjRuleCount.put(subobj, numAttrib);
-
-            // BUILD AND ADD RULE
-            rules.add(
-                    new Rule(item, numAttrib, this.problemBuilder)
-            );
+            return rules;
         }
 
-        public class Rule{
+        // REQUIREMENT RULE - PER SUBOBJECTIVE
+        // -- FORM --
+        // lhs1: (defrule REQUIREMENTS::{{subobjective}}-attrib ?m <- (REQUIREMENTS::Measurement (taken-by ?whom)  (power-duty-cycle# ?pc) (data-rate-duty-cycle# ?dc)
+        // lhs2: (Parameter "{{measurement}}")
+        // lhs3: (attribute ?val{{attributeNum}}&~nil) ...
+        // =>
+        // (bind ?reason "") (bind ?new-reasons (create$ N-A ...))
+        // (bind ?x1 (nth$ (find-bin-num ?val1  (create$ {{thresholds 4200 12000 30000}}) ) (create$ {{scores 1.0 0.67 0.33 0.0}}))) (if (< ?x1 1.0) then (bind ?new-reasons (replace$  ?new-reasons 1 1 "{{justification}}" )) (bind ?reason (str-cat ?reason  "{{justification}}"))) ...
+        // (bind ?list (create$  ?x1 ?x2 ?x3 ?x4 ?x5 ?x6 ?x7 ?x8 ?x9 ?x10))
+        // (assert (AGGREGATION::SUBOBJECTIVE (id WEA1-1) (attributes  Horizontal-Spatial-Resolution# Temporal-resolution# Accuracy# soil-penetration# Swath# sensitivity# image-distortion# orbit-inclination orbit-RAAN All-weather) (index {{rule number}}) (parent WEA1 ) (attrib-scores ?list) (satisfaction (*$ ?list)) (reasons ?new-reasons) (satisfied-by ?whom) (reason ?reason ) (requirement-id (?m getFactId)) (factHistory (str-cat "{R" (?*rulesMap* get REQUIREMENTS::WEA1-1-attrib) " A" (call ?m getFactId) "}")))))
+        public class SubobjectiveRule{
 
-            public String subobj;
-            public String currentSubobj;
-            public String index;
-            public String parent;
-            public String param;
-            public String thresholds;
-            public String scores;
-            public String attrib;
-            public String justif;
-            public String numAttrib;
-            public String naString;
-            public String naFuzzyString;
+            public String            subobjective;
+            public String            measurement;
+            public String            index;
+            public String            parent;
+            public String            NAstring;
 
+            public ArrayList<Attribute> attributes;
 
-            public Rule(RequirementRuleAttributeQuery.Item item, int numAttrib, Problem.Builder problemBuilder){
+            public SubobjectiveRule(RequirementRuleAttributeQuery.Item item, Problem.Builder problemBuilder) {
+                subobjective = item.objective().name();
+                measurement  = item.measurement().name();
+                parent = subobjective.split("-",2)[0];
+                index  = subobjective.split("-",2)[1];
 
-                subobj = currentSubobj = item.objective().name();
-                index      = subobj.split("-",2)[1];
-                parent     = subobj.split("-",2)[0];
-                param      = item.measurement().name() ;
+                problemBuilder.subobjectivesToMeasurements.put(subobjective, measurement);
+                GlobalScope.subobjectivesToMeasurements.put(subobjective, measurement);
 
-                naString      = StringUtils.repeat("N-A ", numAttrib);
-                naFuzzyString = StringUtils.repeat("N-A ", numAttrib + 2);
-
-
-                thresholds = arrayListToString((ArrayList<String>) item.thresholds()); //ArrayList<string / decimal>
-
-
-                // attrib     = item.measurement_attribute().name() + " " + item.type() + " " + arrayListToString((ArrayList<String>) item.thresholds()) + " " + arrayListToString((ArrayList<String>) item.scores());
-                attrib     = item.measurement_attribute().name();
-                justif     =  StringEscapeUtils.unescapeHtml4(item.justification()).replaceAll("&lt;", "<").replaceAll("&gt;", ">");
-                this.numAttrib  = Integer.toString(numAttrib);
-
-                problemBuilder.subobjectivesToMeasurements.put(currentSubobj, param);
+                attributes = new ArrayList<>();
+                this.addAttribute(item);
+                NAstring = " N-A";
             }
 
-            public String arrayListToString(ArrayList<String> ary) {
-                String toReturn = "";
+            public void addAttribute(RequirementRuleAttributeQuery.Item item){
+                attributes.add(
+                        new Attribute(item)
+                );
+                NAstring += " N-A";
+            }
 
-                for (int i = 0; i < ary.size(); i++) {
-                    toReturn = toReturn + " " + objToString(ary.get(i));
+            public class Attribute{
+
+                public String name;
+                public String thresholds;
+                public String scores;
+                public String justification;
+
+                public Attribute(RequirementRuleAttributeQuery.Item item){
+                    name          = item.measurement_attribute().name();
+                    thresholds    = arrayListToString((ArrayList<String>) item.thresholds()); //ArrayList<string / decimal>
+                    scores        = arrayListToString((ArrayList<String>) item.scores());
+                    justification = item.justification();
                 }
 
-                return toReturn;
-            }
+                public String arrayListToString(ArrayList<String> ary) {
+                    String toReturn = "";
 
-            public String objToString(Object obj){
-                if (obj instanceof BigDecimal)
-                    return ((BigDecimal) obj).toString();
-                else
-                    return (String) obj;
+                    for (int i = 0; i < ary.size(); i++) {
+                        toReturn = toReturn + " " + objToString(ary.get(i));
+                    }
+
+                    return toReturn;
+                }
+
+                public String objToString(Object obj){
+                    if (obj instanceof BigDecimal)
+                        return ((BigDecimal) obj).toString();
+                    else
+                        return (String) obj;
+                }
             }
         }
 
@@ -137,26 +160,19 @@ public class RequirementRuleAttributeTemplateRequest extends TemplateRequest {
     // PROCESS REQUEST
     public TemplateResponse processRequest(QueryAPI api) {
         try {
-            RequirementRules  rules = new RequirementRules(this.problemBuilder);
-
             // QUERY
             List<RequirementRuleAttributeQuery.Item> items = api.requirementRuleAttributeQuery();
+            RequirementRules                         rules = new RequirementRules(this.problemBuilder, items);
 
-            items.forEach(
-                    item -> rules.addRule(item)
-            );
-
-            this.context.put("rules", rules);
+            // PARSING
+            this.context.put("rules", rules.getRules());
             this.template.evaluate(this.writer, this.context);
             String ruleStr = this.writer.toString();
-            this.writer.flush();
 
-            this.engine.getTemplate(this.wrapperTemplatePath).evaluate(this.writer, this.context);
-            String wrapperStr = this.writer.toString();
-
+            // RETURN
             GlobalScope.buildMeasurementsToSubobjectives();
             return new TemplateResponse.Builder()
-                    .setTemplateString(ruleStr + " " + wrapperStr)
+                    .setTemplateString(ruleStr)
                     .build();
         }
         catch (Exception e) {

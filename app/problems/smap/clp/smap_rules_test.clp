@@ -17,6 +17,9 @@
 
 ;(deffacts DATABASE::list-of-instruments (DATABASE::list-of-instruments
 ;        (list (create$ SMAP_RAD SMAP_MWR CMIS VIIRS BIOMASS))))
+
+
+
 (reset)
 (defquery DATABASE::get-instruments 
     ?f <- (DATABASE::list-of-instruments (list $?l))
@@ -25,6 +28,7 @@
 (deffunction get-instruments ()
     (bind ?res (run-query* DATABASE::get-instruments))
     (?res next)
+    (printout t "get-instruments" ?res crlf)
     (bind ?f (?res getObject f))
     (return ?f.list)
     )

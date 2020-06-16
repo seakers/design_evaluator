@@ -24,9 +24,9 @@ public class Result implements Serializable {
     private FuzzyValue fuzzyScience;
     private FuzzyValue fuzzyCost;
     private AbstractArchitecture arch;
-    private TreeMap<String,ArrayList<Fact>> explanations;
+    public TreeMap<String,ArrayList<Fact>> explanations;
     private TreeMap<String,Double> subobjectiveScoresMap;
-    private ArrayList<Fact> capabilities;
+    public ArrayList<Fact> capabilities;
     private ArrayList<Fact> costFacts;
     private String taskType;
 

@@ -117,6 +117,18 @@ public class Resource {
 
         }
 
+        private void loadPrecomputedQueries(){
+            HashMap<String,Fact> db_instruments = new HashMap<>();
+            Problem params = this.problemBuilder.build();
+            for (int i = 0; i < params.getNumInstr(); i++) {
+                String instr = params.getInstrumentList()[i];
+                ArrayList<Fact> facts = queryBuilder.makeQuery("DATABASE::Instrument (Name " + instr + ")");
+                Fact f = facts.get(0);
+                db_instruments.put(instr, f);
+            }
+            queryBuilder.addPrecomputedQuery("DATABASE::Instrument", db_instruments);
+        }
+
         public Resource build(){
 
             // EVALUATE TEMPLATE REQUESTS
@@ -127,21 +139,28 @@ public class Resource {
             // EVALUATE RULES
             this.evaluateRules();
 
+            // RESET
+            try                { this.engine.reset(); }
+            catch(Exception e) { System.out.println("Failed final jess reset"); }
+
             // BUILD LAUNCH VEHICLES
             this.buildLaunchVehicles(
                     queryBuilder.makeQuery("DATABASE::Launch-vehicle")
             );
 
-
             // RESET
             try                { this.engine.reset(); }
             catch(Exception e) { System.out.println("Failed final jess reset"); }
 
-            Resource build = new Resource();
-            build.engine     = this.engine;
-            build.appPath    = this.appPath;
-            build.problem    = this.problemBuilder.build();
-            build.requestMode = this.requestMode;
+            // PRECOMPUTE QUERIES
+            this.loadPrecomputedQueries();
+
+
+            Resource build     = new Resource();
+            build.engine       = this.engine;
+            build.appPath      = this.appPath;
+            build.problem      = this.problemBuilder.build();
+            build.requestMode  = this.requestMode;
             build.queryBuilder = this.queryBuilder;
             return build;
         }

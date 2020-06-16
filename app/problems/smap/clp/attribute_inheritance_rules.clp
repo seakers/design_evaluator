@@ -37,9 +37,11 @@
     )
 
 (deffunction get-instrument-mass (?instr)
-    (printout t "get-instrument-mass " ?instr (str-length ?instr) crlf)
+    (printout t "get-instrument-mass " ?instr crlf)
     (bind ?result (run-query* search-instrument-by-name ?instr))
+    (printout t "get-instrument-mass-result " ?result crlf)
     (?result next)
+    (printout t "get-instrument-mass-result-next " ?result crlf)
     (return (?result getDouble m))
     )
 
@@ -86,6 +88,7 @@
 
 (deffunction compute-payload-data-rate ($?payload)
     (bind ?rb 0)
+    (printout t "compute-payload-data-rate" $?payload crlf)
     (foreach ?instr $?payload
         (bind ?rb (+ ?rb (get-instrument-datarate ?instr)))
         )

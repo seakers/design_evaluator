@@ -28,6 +28,7 @@ public class Problem {
     public String orekitResourcesPath;
     public String[] orbitList;
     public String[] instrumentList;
+    public ArrayList<String> parameterList;
     public ArrayList<Integer> numObjectivesPerPanel;
     public ArrayList<ArrayList<ArrayList<Double>>> subobjWeights;
     public ArrayList<ArrayList<ArrayList<String>>> subobjectives;
@@ -42,6 +43,7 @@ public class Problem {
     public static class Builder<T extends Builder<T>>{
 
         public ArrayList<Integer> numObjectivesPerPanel;
+        public ArrayList<String> parameterList;
         public ArrayList<ArrayList<ArrayList<Double>>> subobjWeights;
         public ArrayList<ArrayList<ArrayList<String>>> subobjectives;
 
@@ -57,6 +59,7 @@ public class Problem {
 
 
         public Builder() {
+            this.parameterList = new ArrayList<>();
             this.instrumentList = new String[] {};
             this.orbitList      = new String[] {};
             this.numObjectivesPerPanel = new ArrayList<>();
@@ -69,18 +72,17 @@ public class Problem {
         }
 
         public T setInstrumentList(String[] instrumentList){
-            this.instrumentList = instrumentList;
+            // this.instrumentList = instrumentList;
+            this.instrumentList = new String[]{"BIOMASS", "SMAP_RAD", "SMAP_MWR", "CMIS", "VIIRS"};
             return (T) this;
         }
 
         public T setOrbitList(List<OrbitInformationQuery.Item> items){
             // BUILD PROBLEM
-            String[] orbitList = new String[items.size()];
-            for(int x=0; x < items.size(); x++){
-                orbitList[x] = items.get(x).name();
-            }
-
-
+//            String[] orbitList = new String[items.size()];
+//            for(int x=0; x < items.size(); x++){
+//                orbitList[x] = items.get(x).name();
+//            }
 
             this.orbitList = new String[]{"LEO-600-polar-NA", "SSO-600-SSO-AM", "SSO-600-SSO-DD", "SSO-800-SSO-AM", "SSO-800-SSO-DD"};
             return (T) this;
@@ -162,6 +164,7 @@ public class Problem {
         this.requestMode           = builder.requestMode;
         this.numObjectivesPerPanel = builder.numObjectivesPerPanel;
         this.subobjWeights         = builder.subobjWeights;
+        this.parameterList         = builder.parameterList;
         this.subobjectivesToMeasurements = builder.subobjectivesToMeasurements;
         this.measurementsToSubobjectives = builder.measurementsToSubobjectives;
         this.instrumentsToMeasurements = builder.instrumentsToMeasurements;
@@ -183,10 +186,10 @@ public class Problem {
             orbitIndexes.put(orbitList[i], i);
         }
 
-        orekitResourcesPath = "/home/gabe/repos/seakers/design_evaluator/app/src/main/java/vassar/coverage";
+        orekitResourcesPath = "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/coverage/orekit";
 
         try {
-            FileInputStream fis = new FileInputStream("/home/gabe/repos/seakers/design_evaluator/app/problems/smap/dat/revtimes.dat");
+            FileInputStream fis = new FileInputStream("/Users/gabeapaza/repositories/seakers/design_evaluator/app/problems/smap/dat/revtimes.dat");
             ObjectInputStream ois = new ObjectInputStream(fis);
             this.revtimes = (HashMap<String, HashMap<String, Double>>) ois.readObject();
         }

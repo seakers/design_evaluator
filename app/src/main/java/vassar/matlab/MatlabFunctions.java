@@ -206,8 +206,6 @@ public class MatlabFunctions implements Userfunction {
     }
 
     public Value getLaunchVehiclePerformanceCoeffs(Funcall vv, Context c) {
-        System.out.println("-----> LVDATABASE");
-        System.out.println(lvDatabase);
         String id;
         String orb;
         try {
