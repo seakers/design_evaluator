@@ -259,6 +259,64 @@ query EnabledInstruments($problem_id: Int!){
 
 
 
+query PanelId($problem_id: Int!, $name: String!){
+    items: Stakeholder_Needs_Panel(where: {problem_id: {_eq: $problem_id}, name: {_eq: $name}}) {
+        id
+        name
+    }
+}
+
+query ObjectiveId($problem_id: Int!, $name: String!){
+    items: Stakeholder_Needs_Objective(where: {problem_id: {_eq: $problem_id}, name: {_eq: $name}}) {
+        id
+        name
+    }
+}
+
+query SubobjectiveId($problem_id: Int!, $name: String!){
+    items: Stakeholder_Needs_Subobjective(where: {problem_id: {_eq: $problem_id}, name: {_eq: $name}}) {
+        id
+        name
+    }
+}
+
+
+
+
+
+
+mutation InsertArchitecture($problem_id: Int!, $input: String!, $science: float8, $cost: float8){
+    items: insert_Architecture_one(object: {problem_id: $problem_id, input: $input, science: $science, cost: $cost}) {
+        id
+    }
+}
+
+
+
+
+mutation InsertArchitectureScoreExplanation($architecture_id: Int!, $panel_id: Int!, $satisfaction: float8){
+    items: insert_ArchitectureScoreExplanation_one(object: {architecture_id: $architecture_id, panel_id: $panel_id, satisfaction: $satisfaction}) {
+        id
+    }
+}
+
+mutation InsertPanelScoreExplanation($architecture_id: Int!, $objective_id: Int!, $satisfaction: float8){
+    items: insert_PanelScoreExplanation_one(object: {architecture_id: $architecture_id, objective_id: $objective_id, satisfaction: $satisfaction}) {
+        id
+    }
+}
+
+mutation InsertObjectiveScoreExplanation($architecture_id: Int!, $subobjective_id: Int!, $satisfaction: float8){
+    items: insert_ObjectiveScoreExplanation_one(object: {architecture_id: $architecture_id, subobjective_id: $subobjective_id, satisfaction: $satisfaction}) {
+        id
+    }
+}
+
+
+
+
+
+
 
 
 

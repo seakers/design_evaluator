@@ -1,6 +1,6 @@
 package vassar.result;
 
-import vassar.utils.Interval;
+import vassar.jess.utils.Interval;
 
 import java.util.HashMap;
 import java.util.Iterator;

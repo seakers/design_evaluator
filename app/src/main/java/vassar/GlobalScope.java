@@ -61,6 +61,10 @@ public class GlobalScope {
         measurementsToSubobjectives = inverse;
     }
 
+    public static void init(){
+        measurementsToSubobjectives = new HashMap<>();
+        subobjectivesToMeasurements = new HashMap<>();
+    }
 
 
 }

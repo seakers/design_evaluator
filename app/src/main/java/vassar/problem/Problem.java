@@ -16,9 +16,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 // BASE PARAMS EQUIVALENT
 public class Problem {
+
+    // -- AGGREGATION --
+    public ArrayList<Double>       panelWeights;
+    public ArrayList<String>       panelNames;
+    public HashMap<String, String> panelDescriptions;
+    public ArrayList<Integer>      numObjectivesPerPanel;
+
+    public ArrayList<ArrayList<Double>> objWeights;
+    public ArrayList<ArrayList<String>> objNames;
+    public HashMap<String, String>      objectiveDescriptions;
+    public ArrayList<ArrayList<ArrayList<String>>> subobjectives;
+
+    public ArrayList<ArrayList<ArrayList<Double>>> subobjWeights;
+    public HashMap<String, String> subobjDescriptions;
+    public HashMap<String, Double> subobjWeightsMap;
+
+
 
     public int MAX_TOTAL_INSTR;
     public int numInstr;
@@ -29,9 +47,6 @@ public class Problem {
     public String[] orbitList;
     public String[] instrumentList;
     public ArrayList<String> parameterList;
-    public ArrayList<Integer> numObjectivesPerPanel;
-    public ArrayList<ArrayList<ArrayList<Double>>> subobjWeights;
-    public ArrayList<ArrayList<ArrayList<String>>> subobjectives;
     protected HashMap<String, Integer> instrumentIndexes;
     protected HashMap<String, Integer> orbitIndexes;
     public HashMap<String, HashMap<String, Double>> revtimes;
@@ -42,10 +57,9 @@ public class Problem {
 
     public static class Builder<T extends Builder<T>>{
 
-        public ArrayList<Integer> numObjectivesPerPanel;
+
         public ArrayList<String> parameterList;
-        public ArrayList<ArrayList<ArrayList<Double>>> subobjWeights;
-        public ArrayList<ArrayList<ArrayList<String>>> subobjectives;
+
 
         public String[] orbitList;
         public String[] instrumentList;
@@ -57,14 +71,27 @@ public class Problem {
         public HashMap<String, ArrayList<String>> instrumentsToMeasurements;
         public HashMap<String, ArrayList<String>> measurementsToInstruments;
 
+        // -- AGGREGATION --
+        public ArrayList<Double>       panelWeights;
+        public ArrayList<String>       panelNames;
+        public HashMap<String, String> panelDescriptions;
+        public ArrayList<Integer>      numObjectivesPerPanel;
+
+        public ArrayList<ArrayList<Double>> objWeights;
+        public ArrayList<ArrayList<String>> objNames;
+        public HashMap<String, String>      objectiveDescriptions;
+        public ArrayList<ArrayList<ArrayList<String>>> subobjectives;
+
+        public ArrayList<ArrayList<ArrayList<Double>>> subobjWeights;
+        public HashMap<String, String> subobjDescriptions;
+        public HashMap<String, Double> subobjWeightsMap;
+
 
         public Builder() {
             this.parameterList = new ArrayList<>();
             this.instrumentList = new String[] {};
             this.orbitList      = new String[] {};
-            this.numObjectivesPerPanel = new ArrayList<>();
-            this.subobjWeights = new ArrayList<>();
-            this.subobjectives = new ArrayList<>();
+
             subobjectivesToMeasurements = new HashMap<>();
             measurementsToSubobjectives = new HashMap<>();
             instrumentsToMeasurements = new HashMap<>();
@@ -124,17 +151,45 @@ public class Problem {
         }
 
         public T setAggregationRules(List<AggregationRuleQuery.Item> rules){
-            this.numPanels = rules.size();
-            for (AggregationRuleQuery.Item panel : rules) {
+
+            // PANELS
+            this.panelWeights          = new ArrayList<>();
+            this.panelNames            = new ArrayList<>();
+            this.numObjectivesPerPanel = new ArrayList<>();
+            this.panelDescriptions     = new HashMap<>();
+            this.numPanels             = rules.size();
+
+            // OBJECTIVES
+            this.objWeights            = new ArrayList<>();
+            this.objNames              = new ArrayList<>();
+            this.objectiveDescriptions = new HashMap<>();
+
+            // SUBOVJECTIVES
+            this.subobjWeights         = new ArrayList<>();
+            this.subobjectives         = new ArrayList<>();
+            this.subobjDescriptions    = new HashMap<>();
+            this.subobjWeightsMap      = new HashMap<>();
+
+            for (AggregationRuleQuery.Item panel : rules) {  // FOR EACH: panel
+                this.panelWeights.add(Double.parseDouble(panel.weight().toString()));
+                this.panelNames.add(panel.name());
                 this.numObjectivesPerPanel.add(panel.objectives().size());
+                this.panelDescriptions.put(panel.name(), panel.description());
 
                 ArrayList<ArrayList<Double>> subobjWeights2 = new ArrayList<>();
                 ArrayList<ArrayList<String>> subobjectives2 = new ArrayList<>();
-                for (AggregationRuleQuery.Objective objective : panel.objectives()){
+                ArrayList<Double> objWeights2 = new ArrayList<>();
+                ArrayList<String> objNames2   = new ArrayList<>();
+                for (AggregationRuleQuery.Objective objective : panel.objectives()){  // FOR EACH: objective
+                    objWeights2.add(Double.parseDouble(objective.weight().toString()));
+                    objNames2.add(objective.name());
+                    this.objectiveDescriptions.put(objective.name(), objective.description());
 
                     ArrayList<Double> subobjWeights3 = new ArrayList<>();
                     ArrayList<String> subobjectives3 = new ArrayList<>();
-                    for (AggregationRuleQuery.Subobjective subobjective : objective.subobjectives()){
+                    for (AggregationRuleQuery.Subobjective subobjective : objective.subobjectives()){ // FOR EACH: subobjective
+                        this.subobjDescriptions.put(subobjective.name(), subobjective.description());
+                        this.subobjWeightsMap.put(subobjective.name(), Double.parseDouble(subobjective.weight().toString()));
                         subobjWeights3.add(((BigDecimal) subobjective.weight()).doubleValue());
                         subobjectives3.add(subobjective.name());
                     }
@@ -143,12 +198,17 @@ public class Problem {
                 }
                 subobjWeights.add(subobjWeights2);
                 subobjectives.add(subobjectives2);
+                this.objWeights.add(objWeights2);
+                this.objNames.add(objNames2);
             }
             return (T) this;
         }
 
         public T setRequestMode(String requestMode){
             this.requestMode = requestMode;
+//            System.out.println("REQUEST MODE!!! " + this.requestMode);
+//            try                            { TimeUnit.SECONDS.sleep(10); }
+//            catch (InterruptedException e) { e.printStackTrace(); }
             return (T) this;
         }
 
@@ -161,9 +221,27 @@ public class Problem {
 
     protected Problem(Builder<?> builder){
 
-        this.requestMode           = builder.requestMode;
+        // -- AGGREGATION --
+        this.panelNames            = builder.panelNames;
+        this.panelWeights          = builder.panelWeights;
         this.numObjectivesPerPanel = builder.numObjectivesPerPanel;
+        this.panelDescriptions     = builder.panelDescriptions;
+        this.numPanels             = builder.numPanels;
+
+        this.objWeights            = builder.objWeights;
+        this.objNames              = builder.objNames;
+        this.objectiveDescriptions = builder.objectiveDescriptions;
+
         this.subobjWeights         = builder.subobjWeights;
+        this.subobjectives         = builder.subobjectives;
+        this.subobjDescriptions    = builder.subobjDescriptions;
+        this.subobjWeightsMap      = builder.subobjWeightsMap;
+
+
+
+
+
+        this.requestMode           = builder.requestMode;
         this.parameterList         = builder.parameterList;
         this.subobjectivesToMeasurements = builder.subobjectivesToMeasurements;
         this.measurementsToSubobjectives = builder.measurementsToSubobjectives;
@@ -186,7 +264,7 @@ public class Problem {
             orbitIndexes.put(orbitList[i], i);
         }
 
-        orekitResourcesPath = "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/coverage/orekit";
+        orekitResourcesPath = "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/evaluator/coverage/orekit";
 
         try {
             FileInputStream fis = new FileInputStream("/Users/gabeapaza/repositories/seakers/design_evaluator/app/problems/smap/dat/revtimes.dat");

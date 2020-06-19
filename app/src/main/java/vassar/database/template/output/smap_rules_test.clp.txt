@@ -1,1 +1,0 @@
-/Users/gabeapaza/repositories/seakers/design_evaluator/app/problems/smap/clp/smap_rules_test.clp

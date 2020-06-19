@@ -7,7 +7,7 @@ import vassar.architecture.Architecture;
 
 import vassar.jess.Resource;
 import vassar.problem.Problem;
-import vassar.spacecraft.Orbit;
+import vassar.evaluator.spacecraft.Orbit;
 import vassar.matlab.MatlabFunctions;
 
 import java.util.*;

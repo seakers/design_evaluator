@@ -1,6 +1,6 @@
 (defglobal ?*app_path* = "{{appPath}}")
 (import vassar.*)
-(import vassar.utils.*)
+(import vassar.jess.utils.*)
 (import vassar.result.*)
 (import java.util.*)
 (import jess.*)

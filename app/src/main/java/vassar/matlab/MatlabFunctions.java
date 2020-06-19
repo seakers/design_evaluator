@@ -8,8 +8,8 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.lang.reflect.Method;
 
-import vassar.spacecraft.LaunchVehicle;
-import vassar.utils.Interval;
+import vassar.evaluator.spacecraft.LaunchVehicle;
+import vassar.jess.utils.Interval;
 
 import jess.*;
 

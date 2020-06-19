@@ -20,6 +20,7 @@ import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.auth.credentials.EnvironmentVariableCredentialsProvider;
 
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +30,7 @@ public class EvaluatorApp {
     public static void main(String[] args) {
         System.out.println("os.name: "+System.getProperty("orekit.coveragedatabase"));
         System.out.println("os.name: "+System.getProperty("user.dir"));
-        System.setProperty("orekit.coveragedatabase", "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/coverage/orekit/CoverageDatabase");
+        System.setProperty("orekit.coveragedatabase", "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/evaluator/coverage/orekit/CoverageDatabase");
 
 
 
@@ -41,7 +42,7 @@ public class EvaluatorApp {
 //      |__| |__| \__| |__|     |__|
 
 
-        OrekitConfig.init(1, "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/coverage/orekit");
+        OrekitConfig.init(1, "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/evaluator/coverage/orekit");
 
         GlobalScope.measurementsToSubobjectives = new HashMap<>();
         GlobalScope.subobjectivesToMeasurements = new HashMap<>();
@@ -49,12 +50,11 @@ public class EvaluatorApp {
         String rootPath = "/Users/gabeapaza/repositories/seakers/design_evaluator";
 
 
-        String jessAppFuncPath    = rootPath + "/app/ptypes/functions";
         String outputFilePath     = rootPath + "/app/debug/dbOutput.json";
-        String outputPath         = rootPath + "/app/src/main/java/vassar/database/template/output";
-        String graphqlEndpoint    = "http://localhost:6002/v1/graphql";
+        String outputPath         = rootPath + "/app/debug";
         String localstackEndpoint = "http://localhost:4576";
         String apollo_url         = "http://localhost:6002/v1/graphql";
+        String queue_url          = "http://localhost:4576/queue/test_queue";
         boolean debug             = true;
 
         int group_id   = 1;
@@ -66,10 +66,10 @@ public class EvaluatorApp {
             add( new Worsen() );
         }};
 
-
+        ///Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/utils/clp
         // -----> JESS REQUESTS <-----
         String jessGlobalTempPath = rootPath + "/app/src/main/java/vassar/database/template/defs";
-        String jessGlobalFuncPath = rootPath + "/app/ptypes/functions";
+        String jessGlobalFuncPath = rootPath + "/app/src/main/java/vassar/jess/utils/clp";
         String jessAppPath        = rootPath + "/app/problems/smap/clp";
         String requestMode        = "CRISP-ATTRIBUTES";
         Requests requests = new Requests.Builder()
@@ -109,6 +109,7 @@ public class EvaluatorApp {
                                         .build();
 
 
+
         Resource engine = new Resource.Builder(dbClient)
                                         .addUserFunctionBatch(userFuncs)      // - Improve(), SameOrBetter(), Worsen()
                                         .setRequests(requests.getRequests()) // - eval: template requests (+ functions)
@@ -138,6 +139,7 @@ public class EvaluatorApp {
 
         Consumer evaluator = new Consumer.Builder(sqsClient)
                                          .setVassarClient(vClient)
+                                         .setQueueUrl(queue_url)
                                          .debug(debug)
                                          .build();
 

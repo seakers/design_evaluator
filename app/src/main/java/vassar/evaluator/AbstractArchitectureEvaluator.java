@@ -12,16 +12,16 @@ import vassar.jess.QueryBuilder;
 import vassar.jess.Resource;
 import vassar.result.FuzzyValue;
 import vassar.result.Result;
-import vassar.utils.Interval;
+import vassar.jess.utils.Interval;
 import vassar.matlab.MatlabFunctions;
 
-import vassar.coverage.CoverageAnalysis;
+import vassar.evaluator.coverage.CoverageAnalysis;
 import seakers.orekit.coverage.access.TimeIntervalArray;
 import seakers.orekit.event.EventIntervalMerger;
 
 import vassar.architecture.AbstractArchitecture;
 import vassar.problem.Problem;
-import vassar.spacecraft.Orbit;
+import vassar.evaluator.spacecraft.Orbit;
 
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -280,6 +280,7 @@ public abstract class AbstractArchitectureEvaluator implements Callable<Result> 
             r.setFocus("SYNERGIES-ACROSS-ORBITS");
             r.run();
 
+
             if ((params.getRequestMode().equalsIgnoreCase("FUZZY-CASES")) || (params.getRequestMode().equalsIgnoreCase("FUZZY-ATTRIBUTES"))) {
                 r.setFocus("FUZZY-REQUIREMENTS");
             }
@@ -366,6 +367,10 @@ public abstract class AbstractArchitectureEvaluator implements Callable<Result> 
             }
 
             //Subobjective scores
+            System.out.println("----- EVAL SUBOBJECTIVE");
+            System.out.println(params.numPanels);
+            System.out.println(params.numObjectivesPerPanel);
+            System.out.println(params.subobjectives);
             for (int p = 0; p < params.numPanels; p++) {
                 int nob = params.numObjectivesPerPanel.get(p);
                 ArrayList<ArrayList<Double>> subobj_scores_p = new ArrayList<>(nob);
@@ -410,7 +415,8 @@ public abstract class AbstractArchitectureEvaluator implements Callable<Result> 
         Result theresult = new Result(arch, science, cost, fuzzy_science, fuzzy_cost, subobj_scores, obj_scores,
                 panel_scores, subobj_scores_map);
 
-        this.debug = true;
+        System.out.println("----- RESULT:");
+        System.out.println(subobj_scores);
         if (this.debug) {
             theresult.setCapabilities(qb.makeQuery("REQUIREMENTS::Measurement"));
             theresult.setExplanations(explanations);

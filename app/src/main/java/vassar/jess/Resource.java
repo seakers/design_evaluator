@@ -1,11 +1,12 @@
 package vassar.jess;
 
 import jess.*;
+import vassar.GlobalScope;
 import vassar.database.DatabaseClient;
 import vassar.database.template.TemplateRequest;
 import vassar.jess.func.RawSafety;
 import vassar.problem.Problem;
-import vassar.spacecraft.LaunchVehicle;
+import vassar.evaluator.spacecraft.LaunchVehicle;
 import vassar.matlab.MatlabFunctions;
 
 import java.util.ArrayList;
@@ -14,17 +15,26 @@ import java.util.Iterator;
 
 public class Resource {
 
+    // Build Member Variables
+    private ArrayList<Userfunction> buildFuncs;
+    private ArrayList<TemplateRequest> buildRequests;
+
+
+    // Evaluate Member Variables
     private Rete           engine;
     private String         appPath;
-    private DatabaseClient dbClient;
-    private Problem        problem;
+    public  DatabaseClient dbClient;
+    public  Problem        problem;
     private String         requestMode;
     private QueryBuilder   queryBuilder;
     private MatlabFunctions mFuncs;
 
-
     public static class Builder {
 
+        // Build Member Variables
+        private ArrayList<Userfunction> buildFuncs;
+
+        // Evaluate Member Variables
         private Rete                       engine;
         private String                     appPath;
         private String                     requestMode;
@@ -45,6 +55,7 @@ public class Resource {
         }
 
         public Builder addUserFunctionBatch(ArrayList<Userfunction> funcs) {
+            this.buildFuncs = funcs;
             funcs.forEach( func -> this.engine.addUserfunction(func));
             return this;
         }
@@ -55,6 +66,7 @@ public class Resource {
         }
 
         public Builder setRequestMode(String requestMode) {
+            this.requestMode = requestMode;
             this.problemBuilder.setRequestMode(requestMode);
             return this;
         }
@@ -132,9 +144,12 @@ public class Resource {
         public Resource build(){
 
             // EVALUATE TEMPLATE REQUESTS
+            long startTime = System.nanoTime();
             this.requests.forEach(
                     request -> this.dbClient.processTemplateRequest(request, this.problemBuilder).evaluate(this.engine)
             );
+            long endTime = System.nanoTime();
+            System.out.println("Took "+(endTime - startTime) + " ns");
 
             // EVALUATE RULES
             this.evaluateRules();
@@ -157,6 +172,9 @@ public class Resource {
 
 
             Resource build     = new Resource();
+            build.buildRequests= this.requests;
+            build.buildFuncs   = this.buildFuncs;
+            build.dbClient     = this.dbClient;
             build.engine       = this.engine;
             build.appPath      = this.appPath;
             build.problem      = this.problemBuilder.build();
@@ -176,4 +194,15 @@ public class Resource {
     public QueryBuilder getQueryBuilder() { return this.queryBuilder; }
 
 
+
+    public Resource rebuild(int group_id, int problem_id, ArrayList<TemplateRequest> newRequests){
+
+        this.dbClient.setGroupID(group_id);
+        this.dbClient.setProblemID(problem_id);
+
+        GlobalScope.init();
+
+        Resource newResource = new Resource.Builder(this.dbClient).addUserFunctionBatch(this.buildFuncs).setRequests(newRequests).setRequestMode(this.requestMode).build();
+        return   newResource;
+    }
 }
