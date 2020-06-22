@@ -28,9 +28,8 @@ import java.util.HashMap;
 public class EvaluatorApp {
 
     public static void main(String[] args) {
-        System.out.println("os.name: "+System.getProperty("orekit.coveragedatabase"));
-        System.out.println("os.name: "+System.getProperty("user.dir"));
-        System.setProperty("orekit.coveragedatabase", "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/evaluator/coverage/orekit/CoverageDatabase");
+        // System.setProperty("orekit.coveragedatabase", "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/evaluator/coverage/orekit/CoverageDatabase");
+        System.setProperty("orekit.coveragedatabase", System.getenv("COVERAGE_DATABASE")); // DOCKER
 
 
 
@@ -42,19 +41,21 @@ public class EvaluatorApp {
 //      |__| |__| \__| |__|     |__|
 
 
-        OrekitConfig.init(1, "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/evaluator/coverage/orekit");
+        // OrekitConfig.init(1, "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/evaluator/coverage/orekit");
+        OrekitConfig.init(1, System.getenv("OREKIT_INIT")); // DOCKER
 
         GlobalScope.measurementsToSubobjectives = new HashMap<>();
         GlobalScope.subobjectivesToMeasurements = new HashMap<>();
 
-        String rootPath = "/Users/gabeapaza/repositories/seakers/design_evaluator";
+        // String rootPath = "/Users/gabeapaza/repositories/seakers/design_evaluator";
+        String rootPath = ""; // DOCKER
 
 
         String outputFilePath     = rootPath + "/app/debug/dbOutput.json";
         String outputPath         = rootPath + "/app/debug";
-        String localstackEndpoint = "http://localhost:4576";
-        String apollo_url         = "http://localhost:6002/v1/graphql";
-        String queue_url          = "http://localhost:4576/queue/test_queue";
+        String apollo_url         = "http://172.18.0.8:8080/v1/graphql";
+        String localstackEndpoint = "http://172.18.0.3:4576";
+        String queue_url          = "http://172.18.0.3:4576/queue/test_queue";
         boolean debug             = true;
 
         int group_id   = 1;
@@ -66,7 +67,7 @@ public class EvaluatorApp {
             add( new Worsen() );
         }};
 
-        ///Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/utils/clp
+
         // -----> JESS REQUESTS <-----
         String jessGlobalTempPath = rootPath + "/app/src/main/java/vassar/database/template/defs";
         String jessGlobalFuncPath = rootPath + "/app/src/main/java/vassar/jess/utils/clp";

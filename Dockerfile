@@ -1,54 +1,79 @@
+########################
+### Build Containers ###
+########################
+
+## 1. SystemArchitectureProblems ##
+FROM maven:3-jdk-11-slim AS SystemArchitectureProblems
+WORKDIR /deps/SystemArchitectureProblems
+COPY /deps/SystemArchitectureProblems /deps/SystemArchitectureProblems
+RUN mvn install
+
+
+## 2. Orekit + Jess ##
+FROM maven:3-jdk-11-slim AS Orekit
+WORKDIR /deps/orekit/orekit
+COPY --from=SystemArchitectureProblems /root/.m2 /root/.m2
+COPY /deps/orekit /deps/orekit
+COPY /deps/jars /deps/jars
+WORKDIR /deps/orekit/orekit
+RUN mvn install
+WORKDIR /deps/jars
+RUN mvn install:install-file -Dfile=./jess.jar -DgroupId=gov.sandia -DartifactId=jess -Dversion=7.1p2 -Dpackaging=jar
+
+
+## 3. Graphql Schema: node ##
+# FROM node:14-alpine AS Schema
+# WORKDIR /schema
+# RUN npm install -g apollo
+# RUN apollo schema:download --endpoint https://172.18.0.7:8080/v1/graphql --header 'X-Hasura-Admin-Secret: daphne'
+
+
+
+
+
+#######################
+### Final Container ###
+#######################
+
+
 FROM amazoncorretto:11
-# EXPOSE 9090
-
-ENV AWS_ACCESS_KEY_ID=AKIAJVM34C5MCCWRJCCQ
-ENV AWS_SECRET_ACCESS_KEY=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
+# COPY --from=Schema /schema/schema.json /app/src/main/graphql/com/evaluator/schema.json
+COPY --from=Orekit /root/.m2 /root/.m2
 
 
-
-
-# -- DEPS + MAVEN --
+# -- DEPS --
 WORKDIR /installs
 
 RUN yum update -y && \
     yum upgrade -y && \
-    yum install git -y && \
-    yum install wget -y && \
-    yum install unzip -y && \
-    yum install tar -y && \
-    wget http://mirrors.gigenet.com/apache/maven/maven-3/3.6.3/binaries/apache-maven-3.6.3-bin.tar.gz && \
-    tar xzvf apache-maven-3.6.3-bin.tar.gz && \
-    rm apache-maven-3.6.3-bin.tar.gz
-
-ENV PATH="/installs/apache-maven-3.6.3/bin:${PATH}"
-
+    yum install git wget unzip tar -y
 
 # -- GRADLE --
 RUN wget https://services.gradle.org/distributions/gradle-6.0-bin.zip && \
-    unzip gradle-6.0-bin.zip
+    unzip gradle-6.0-bin.zip && \
+    rm gradle-6.0-bin.zip
 ENV PATH="/installs/gradle-6.0/bin:${PATH}"
 
+# -- GRAPHQL SCHEMA --
+WORKDIR /app/
+RUN gradle generateApolloSources
 
 
-# Get repositories
-WORKDIR /app/java_libs
-WORKDIR /app
 
-# COPY ./dockerfile_resources/jess.jar /app/VASSAR/java_libs/.
-COPY ./jars/jess.jar /app/java_libs/.
+CMD gradle run
 
-# RUN git clone https://github.com/seakers/VASSAR_lib.git && \
-#     git clone https://github.com/seakers/SystemArchitectureProblems.git && \
-#     git clone https://github.com/seakers/orekit.git && \
-#     git clone https://github.com/seakers/VASSAR_resources.git && \
-#     cd java_libs && \
-#     mvn install:install-file -Dfile=./jess.jar -DgroupId=gov.sandia -DartifactId=jess -Dversion=7.1p2 -Dpackaging=jar && \
-#     cd /app/VASSAR/SystemArchitectureProblems && \
-#     mvn install && \
-#     cd /app/VASSAR/orekit/orekit && \
-#     mvn install && \
-#     cd /app/VASSAR/VASSAR_lib && \
-#     JAVA_LIBS=../java_libs gradle jar
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

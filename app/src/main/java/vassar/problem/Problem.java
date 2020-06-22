@@ -264,10 +264,13 @@ public class Problem {
             orbitIndexes.put(orbitList[i], i);
         }
 
-        orekitResourcesPath = "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/evaluator/coverage/orekit";
+        // orekitResourcesPath = "/Users/gabeapaza/repositories/seakers/design_evaluator/app/src/main/java/vassar/evaluator/coverage/orekit";
+        orekitResourcesPath = "/app/src/main/java/vassar/evaluator/coverage/orekit"; // DOCKER
+
 
         try {
-            FileInputStream fis = new FileInputStream("/Users/gabeapaza/repositories/seakers/design_evaluator/app/problems/smap/dat/revtimes.dat");
+            // FileInputStream fis = new FileInputStream("/Users/gabeapaza/repositories/seakers/design_evaluator/app/problems/smap/dat/revtimes.dat");
+            FileInputStream fis = new FileInputStream("/app/problems/smap/dat/revtimes.dat"); // DOCKER
             ObjectInputStream ois = new ObjectInputStream(fis);
             this.revtimes = (HashMap<String, HashMap<String, Double>>) ois.readObject();
         }

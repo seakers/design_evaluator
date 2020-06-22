@@ -2,13 +2,13 @@ package vassar;
 
 
 
-//          ____   ____                                     ______  __    _                  _
-//         |_  _| |_  _|                                  .' ___  |[  |  (_)                / |_
-//           \ \   / /,--.   .--.   .--.   ,--.   _ .--. / .'   \_| | |  __  .---.  _ .--. `| |-'
-//            \ \ / /`'_\ : ( (`\] ( (`\] `'_\ : [ `/'`\]| |        | | [  |/ /__\\[ `.-. | | |
-//             \ ' / // | |, `'.'.  `'.'. // | |, | |    \ `.___.'\ | |  | || \__., | | | | | |,
-//              \_/  \'-;__/[\__) )[\__) )\'-;__/[___]    `.____ .'[___][___]'.__.'[___||__]\__/
-
+// -  -  -   ____   ____                                     ______  __    _                  _
+// -  -  -  |_  _| |_  _|                                  .' ___  |[  |  (_)                / |_
+// -  -  -    \ \   / /,--.   .--.   .--.   ,--.   _ .--. / .'   \_| | |  __  .---.  _ .--. `| |-'
+// -  -  -     \ \ / /`'_\ : ( (`\] ( (`\] `'_\ : [ `/'`\]| |        | | [  |/ /__\\[ `.-. | | |
+// -  -  -      \ ' / // | |, `'.'.  `'.'. // | |, | |    \ `.___.'\ | |  | || \__., | | | | | |,
+// -  -  -       \_/  \'-;__/[\__) )[\__) )\'-;__/[___]    `.____ .'[___][___]'.__.'[___||__]\__/
+// -  -  -   - Gabe: take it easy m8
 
 import jess.Rete;
 import vassar.architecture.AbstractArchitecture;
@@ -135,23 +135,36 @@ public class VassarClient {
 
 
 
+
+//  _____      _           _ _     _   _____
+// |  __ \    | |         (_) |   | | |  __ \
+// | |__) |___| |__  _   _ _| | __| | | |__) |___  ___  ___  _   _ _ __ ___ ___
+// |  _  // _ \ '_ \| | | | | |/ _` | |  _  // _ \/ __|/ _ \| | | | '__/ __/ _ \
+// | | \ \  __/ |_) | |_| | | | (_| | | | \ \  __/\__ \ (_) | |_| | | | (_|  __/
+// |_|  \_\___|_.__/ \__,_|_|_|\__,_| |_|  \_\___||___/\___/ \__,_|_|  \___\___|
+
+
+
+
     public void rebuildResource(int group_id, int problem_id){
-        String rootPath = "/Users/gabeapaza/repositories/seakers/design_evaluator";
+
+        // String rootPath = "/Users/gabeapaza/repositories/seakers/design_evaluator";
+        String rootPath = ""; // DOCKER
 
         String jessGlobalTempPath = rootPath + "/app/src/main/java/vassar/database/template/defs";
         String jessGlobalFuncPath = rootPath + "/app/src/main/java/vassar/jess/utils/clp";
         String jessAppPath        = rootPath + "/app/problems/smap/clp";
         String requestMode        = "CRISP-ATTRIBUTES";
         Requests newRequests = new Requests.Builder()
-                .setGlobalTemplatePath(jessGlobalTempPath)
-                .setGlobalFunctionPath(jessGlobalFuncPath)
-                .setFunctionTemplates()
-                .setRequestMode(requestMode)
-                .setJessAppPath(jessAppPath)
-                .build();
+                                           .setGlobalTemplatePath(jessGlobalTempPath)
+                                           .setGlobalFunctionPath(jessGlobalFuncPath)
+                                           .setFunctionTemplates()
+                                           .setRequestMode(requestMode)
+                                           .setJessAppPath(jessAppPath)
+                                           .build();
 
         Resource newResource = this.engine.rebuild(group_id, problem_id, newRequests.getRequests());
-        this.engine = newResource;
+        this.engine          = newResource;
     }
 
 

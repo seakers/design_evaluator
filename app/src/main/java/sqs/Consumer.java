@@ -66,18 +66,19 @@ public class Consumer implements Runnable{
 
     public void run() {
         int counter = 0;
-        String arch = "0000000010000000000000000";
-        String arch2= "0000000010000000100000000";
 
-        this.sendEvalMessage(arch, 0);
-        // this.sendEvalMessage(arch2, 0);
-        this.sendBuildMessage(1, 1, 0);
-        this.sendEvalMessage(arch, 0);
-        this.sendExitMessage(0);
+//        String arch = "0000000010000000000000000";
+//        String arch2= "0000000010000000100000000";
+
+//        this.sendEvalMessage(arch, 0);
+//        this.sendEvalMessage(arch2, 0);
+//        this.sendBuildMessage(1, 1, 0);
+//        this.sendEvalMessage(arch, 0);
+//        this.sendExitMessage(0);
 
         while(this.running){
             System.out.println("-----> Loop iteration: " + counter);
-            this.consumerSleep(2);
+            this.consumerSleep(1);
 
             List<Message> messages = this.getMessages(1, 5);
 
@@ -112,7 +113,7 @@ public class Consumer implements Runnable{
 
 
 
-
+    // ---> MESSAGE TYPES
     public void mgsTypeEvaluate(HashMap<String, String> msg_contents){
 
         String input  = msg_contents.get("input");
@@ -123,9 +124,8 @@ public class Consumer implements Runnable{
         System.out.println("------> COST: " + result.getCost());
         System.out.println("---> SCIENCE: " + result.getScience());
         System.out.println("----------------------------------------------------------\n");
-        this.consumerSleep(5);
+        // this.consumerSleep(5);
     }
-
 
     public void msgTypeBuild(HashMap<String, String> msg_contents){
         int group_id   = Integer.parseInt(msg_contents.get("group_id"));
@@ -137,24 +137,12 @@ public class Consumer implements Runnable{
         System.out.println("--------> GROUP ID: " + group_id);
         System.out.println("------> PROBLEM ID: " + problem_id);
         System.out.println("-------------------------------------------------------\n");
-        this.consumerSleep(5);
+        // this.consumerSleep(5);
     }
 
-    public void consumerSleep(int seconds){
-        try                            { TimeUnit.SECONDS.sleep(seconds); }
-        catch (InterruptedException e) { e.printStackTrace(); }
-    }
 
-    public void deleteMessages(List<Message> messages){
-        for (Message message : messages) {
-            DeleteMessageRequest deleteMessageRequest = DeleteMessageRequest.builder()
-                    .queueUrl(queueUrl)
-                    .receiptHandle(message.receiptHandle())
-                    .build();
-            this.sqsClient.deleteMessage(deleteMessageRequest);
-        }
-    }
-
+    // ---> MESSAGE FLOW
+    // 1.
     public List<Message> getMessages(int maxMessages, int waitTimeSeconds){
         ReceiveMessageRequest receiveMessageRequest = ReceiveMessageRequest.builder()
                 .queueUrl(this.queueUrl)
@@ -166,6 +154,7 @@ public class Consumer implements Runnable{
         return this.sqsClient.receiveMessage(receiveMessageRequest).messages();
     }
 
+    // 2.
     public HashMap<String, String> processMessage(Message msg){
         HashMap<String, String> contents = new HashMap<>();
         contents.put("body", msg.body());
@@ -176,9 +165,28 @@ public class Consumer implements Runnable{
             System.out.println("---> ATTRIBUTE: " + key + " - " + msg.messageAttributes().get(key).stringValue());
         }
         System.out.println("-------------------------------------------\n");
-        this.consumerSleep(5);
+        // this.consumerSleep(5);
         return contents;
     }
+
+    // 3.
+    public void deleteMessages(List<Message> messages){
+        for (Message message : messages) {
+            DeleteMessageRequest deleteMessageRequest = DeleteMessageRequest.builder()
+                    .queueUrl(queueUrl)
+                    .receiptHandle(message.receiptHandle())
+                    .build();
+            this.sqsClient.deleteMessage(deleteMessageRequest);
+        }
+    }
+
+
+    // ---> THREAD SLEEP
+    public void consumerSleep(int seconds){
+        try                            { TimeUnit.SECONDS.sleep(seconds); }
+        catch (InterruptedException e) { e.printStackTrace(); }
+    }
+
 
 
     public void sendEvalMessage(String input, int delay){
